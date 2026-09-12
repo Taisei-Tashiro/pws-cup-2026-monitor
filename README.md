@@ -32,6 +32,19 @@ Python標準ライブラリのみを使用。OpenAI API、Discord Bot、Docker�
 
 Secret未登録の場合は警告を表示し、公開APIの取得確認だけを行います。**GitHub Actionsが成功しても、Secret未登録なら監視・Discord通知は稼働していません。** Secret登録後の通常実行で基準値を作成し、以後の定期実行で通知します。
 
+## 定期起動（cron-job.org）
+
+cron-job.orgが5分ごと（Asia/Tokyo、毎時0・5・10…55分）にGitHub Actionsを起動します。Actionsの履歴には `PWS Cup 2026 Monitor · cron-job.org` と表示され、イベント種別は `workflow_dispatch` です。PCを閉じても動作します。
+
+- HTTPメソッド: `POST`
+- URL: `https://api.github.com/repos/Taisei-Tashiro/pws-cup-2026-monitor/actions/workflows/monitor-scheduled.yml/dispatches`
+- ヘッダー: `Accept: application/vnd.github+json`、`Content-Type: application/json`、`X-GitHub-Api-Version: 2026-03-10`、`Authorization: Bearer <GitHubトークン>`
+- 本文: `{"ref":"main","inputs":{"dry_run":false,"trigger_source":"cron-job.org"}}`
+- GitHubトークンはこのリポジトリのみを対象とするfine-grained tokenで、Actions読み書きと必須のMetadata読み取りを付与します。トークンはcron-job.orgだけに保存し、コード・文書には記録しません。Discord WebhookはGitHub Secretに保持します。
+- 現在のトークン有効期限は **2026年10月12日23:51 JST**。それ以降も監視する場合は、期限前にトークンを更新してcron-job.orgのAuthorizationヘッダーを差し替えます。
+- cron-job.orgのHTTP 200は起動要求の受付成功です。実際の監視はGitHub Actionsの `Monitor current leaderboard` と状態保存ステップの成功も確認します。起動要求の失敗時はcron-job.orgのメール通知が届く設定です。
+- 停止はcron-job.orgのジョブの `Enable job` をオフにします。GitHub標準の `schedule` は併用せず、手動実行用の `workflow_dispatch` は残します。
+
 ## 手元で確認
 
 ```sh
@@ -43,8 +56,8 @@ python3 main.py --dry-run
 
 ## 運用上の制約
 
-- GitHub Actionsの実行間隔は5分に設定していますが、混雑で遅延・取りこぼしが生じ得ます。5分以内の検知を保証するものではありません。
-- 公開リポジトリの標準GitHub-hosted runnerは無料です。公開リポジトリでは60日間アクティビティがないと定期実行が無効になる場合があります。長期運用時はActionsの有効状態を確認してください。
+- cron-job.orgの起動要求は5分間隔ですが、サービス障害やGitHub Actionsの待ち時間があるため5分以内の検知を保証するものではありません。
+- cron-job.orgと公開リポジトリの標準GitHub-hosted runnerを使用します。長期運用時はトークンの期限、cron-job.orgのジョブ有効状態、Actionsの実行結果を確認してください。
 - CodaBenchのAPI構造が変わった場合は対応が必要です。API取得失敗や破損した保存状態は正常な空データとして扱いません。
 - 状態ブランチには公開Leaderboardから得た表示名・得点・順位が保存されます。
 
@@ -53,5 +66,7 @@ python3 main.py --dry-run
 - [Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 - [Discordのチャンネル権限](https://support.discord.com/hc/en-us/articles/10543994968087-Channel-Permissions-Settings-101)
 - [GitHub Actionsのschedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+- [cron-job.org](https://cron-job.org/en/)
+- [GitHub Actionsの外部起動API](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)
 - [GitHub Actionsの課金](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 - [CodaBench公式API実装](https://github.com/codalab/codabench/blob/develop/src/apps/api/views/competitions.py)
