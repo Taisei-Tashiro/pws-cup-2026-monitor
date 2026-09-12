@@ -94,7 +94,7 @@ class MonitorTests(unittest.TestCase):
         empty['rows'] = []
         for before, after in [(old, new), (empty, new), (new, empty)]:
             text = '\n'.join(main.changes(before, after))
-            self.assertIn('【コホート5】ステテコは恥だが役に立つ', text)
+            self.assertIn('【コホート28】ステテコは恥だが役に立つ', text)
             self.assertIn('CodaBench: zhiyan\n提出ID', text)
             self.assertIn('999', text)
 
@@ -104,7 +104,7 @@ class MonitorTests(unittest.TestCase):
             raw = board()
             raw['submissions'][0].update(owner=display, slug_url=f'/profiles/user/{account}/')
             row = main.snapshot(phase(), raw)['rows'][0]
-            self.assertIn(f'【コホート{cohort}】', main.participant_label(row))
+            self.assertIn(f'【コホート{cohort}】', main.participant_label(row, phase_name="予備戦：加工フェーズ"))
 
     def test_old_saved_rows_upgrade_silently(self):
         old = copy.deepcopy(self.initial)
@@ -138,7 +138,62 @@ class MonitorTests(unittest.TestCase):
     def test_removed_team(self):
         changed = copy.deepcopy(self.initial)
         changed["rows"].pop()
-        self.assertIn("掲載終了：**Bob", main.messages(self.initial, changed)[0])
+        self.assertIn("取り下げ・掲載終了：**Bob", main.messages(self.initial, changed)[0])
+
+    def test_stage_specific_cohorts_including_zero(self):
+        for account, preliminary, final in [('anonymada', 4, 0), ('zhiyan', 5, 28)]:
+            raw = board()
+            raw['submissions'][0].update(owner=account, slug_url=f'/user/{account}')
+            row = main.snapshot(phase(), raw)['rows'][0]
+            for stage, cohort in [('予備戦', preliminary), ('本戦', final)]:
+                self.assertIn(f'【コホート{cohort}】', main.participant_label(row, phase_name=stage + '：加工フェーズ'))
+            self.assertIn('コホート未確認', main.participant_label(row, phase_name='練習'))
+
+    def test_duplicate_participant_removal_identifies_missing_submission(self):
+        raw = board()
+        raw['submissions'][1].update(owner='Alice', slug_url='/user/Alice')
+        before = main.snapshot(phase(), raw)
+        raw['submissions'].pop(0)
+        raw['count'] = 1
+        after = main.snapshot(phase(), raw)
+        blocks = main.changes(before, after)
+        removed = [b for b in blocks if '取り下げ・掲載終了' in b]
+        self.assertEqual(len(removed), 1)
+        self.assertIn('提出ID: 100', removed[0])
+        self.assertIn('前回順位 1位', removed[0])
+        self.assertIn('0.9', removed[0])
+        updated = [b for b in blocks if '更新：' in b]
+        self.assertEqual(len(updated), 1)
+        self.assertIn('提出ID: 200', updated[0])
+        self.assertIn('順位 2位 → 1位', updated[0])
+        self.assertNotIn('提出ID 100 → 200', '\n'.join(blocks))
+
+    def test_all_removed_once_and_reappearance(self):
+        self.run_monitor(self.initial)
+        empty = copy.deepcopy(self.initial)
+        empty['rows'] = []
+        self.run_monitor(empty)
+        count = len(self.sent)
+        self.assertGreater(count, 0)
+        self.assertIn('取り下げ・掲載終了', '\n'.join(self.sent))
+        self.assertEqual(main.load_state(self.path)['snapshot']['rows'], [])
+        self.run_monitor(empty)
+        self.assertEqual(len(self.sent), count)
+        self.run_monitor(self.initial)
+        self.assertIn('参加：', '\n'.join(self.sent[count:]))
+
+    def test_phase_transition_is_not_withdrawal(self):
+        raw = board()
+        raw['submissions'][0].update(owner='zhiyan', slug_url='/user/zhiyan')
+        preliminary = phase()
+        preliminary['name'] = '予備戦：加工フェーズ'
+        before = main.snapshot(preliminary, raw)
+        after = copy.deepcopy(before)
+        after.update(phase_id=2, phase_name='本戦：加工フェーズ', rows=[])
+        text = '\n'.join(main.messages(before, after))
+        self.assertIn('フェーズ移行により監視対象外', text)
+        self.assertIn('【コホート5】', text)
+        self.assertNotIn('取り下げ', text)
 
     def test_no_active_phase_preserves_state(self):
         self.run_monitor(self.initial)

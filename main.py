@@ -146,7 +146,7 @@ def safe_text(value):
     return re.sub(r"([\\`*_~>|])", r"\\\1", str(value)).replace("\n", " ")
 
 
-def participant_label(row, previous=None):
+def participant_label(row, previous=None, phase_name=""):
     """Enrich notification text without changing participant identity or diffing."""
     teams = json.loads(Path(__file__).with_name("teams.json").read_text())
     lookup = {}
@@ -164,7 +164,10 @@ def participant_label(row, previous=None):
         submission_line = f"提出ID {previous['submission_id']} → {submission}"
     else:
         submission_line = f"提出ID: {submission}"
-    title = (f"【コホート{team['cohort']}】{safe_text(team['team'])}" if team
+    stage = "final" if "本戦" in phase_name else "preliminary" if "予備戦" in phase_name else None
+    cohort = team.get("cohorts", {}).get(stage) if team else None
+    cohort_label = f"コホート{cohort}" if cohort is not None else "コホート未確認"
+    title = (f"【{cohort_label}】{safe_text(team['team'])}" if team
              else f"{safe_text(row['name'])}（コホート・チーム名未登録）")
     return f"**{title}**\nCodaBench: {safe_text(row['name'])}\n{submission_line}"
 
@@ -178,15 +181,41 @@ def metric_title(snapshot, key):
     return safe_text(snapshot["columns"].get(key, key))
 
 
-def changes(before, after):
+def align_rows(before, after):
+    """Match surviving submissions first when a participant has multiple rows."""
     old = {r["key"]: r for r in before["rows"]}
-    new = {r["key"]: r for r in after["rows"]}
+    available = dict(old)
+    assigned = {}
+    for index, row in enumerate(after["rows"]):
+        base = row["key"].rsplit(":", 1)[0]
+        for key, prior in list(available.items()):
+            if (key.rsplit(":", 1)[0] == base and row.get("submission_id") is not None
+                    and row["submission_id"] == prior.get("submission_id")):
+                assigned[index] = key
+                del available[key]
+                break
+    new = {}
+    for index, row in enumerate(after["rows"]):
+        base = row["key"].rsplit(":", 1)[0]
+        key = assigned.get(index)
+        if key is None:
+            key = next((k for k in available if k.rsplit(":", 1)[0] == base), None)
+            if key is not None:
+                del available[key]
+            else:
+                key = f"{base}:new:{index}"
+        new[key] = row
+    return old, new
+
+
+def changes(before, after):
+    old, new = align_rows(before, after)
     blocks = []
     for key, row in new.items():
         if key not in old:
             scores = [f"• {metric_title(after, k)}: {v if v is not None else '—'}"
                       for k, v in row["scores"].items()]
-            blocks.append(f"🆕 参加：{participant_label(row)}\n• 順位 {row['rank']}位\n" + "\n".join(scores))
+            blocks.append(f"🆕 参加：{participant_label(row, phase_name=after['phase_name'])}\n• 順位 {row['rank']}位\n" + "\n".join(scores))
             continue
         prev = old[key]
         id_changed = prev.get("submission_id") is not None and prev["submission_id"] != row.get("submission_id")
@@ -201,10 +230,16 @@ def changes(before, after):
             rank = f"• 順位 {prev['rank']}位 → {row['rank']}位" if rank_changed else f"• 順位 {row['rank']}位（変更なし）"
             if not details:
                 details.append("• スコア：変更なし")
-            blocks.append(f"🔄 更新：{participant_label(row, prev)}\n{rank}\n" + "\n".join(details))
+            blocks.append(f"🔄 更新：{participant_label(row, prev, after['phase_name'])}\n{rank}\n" + "\n".join(details))
     for key, row in old.items():
         if key not in new:
-            blocks.append(f"📤 掲載終了：{participant_label(row)}\n• 前回順位 {row['rank']}位")
+            same_phase = before["phase_id"] == after["phase_id"]
+            reason = "取り下げ・掲載終了" if same_phase else "フェーズ移行により監視対象外"
+            scores = [f"• 前回 {metric_title(before, k)}: {v if v is not None else '—'}"
+                      for k, v in row["scores"].items()]
+            note = "\nLeaderboardから掲載がなくなりました（理由はAPIでは判別できません）。" if same_phase else ""
+            blocks.append(f"📤 {reason}：{participant_label(row, phase_name=before['phase_name'])}"
+                          f"\n• 前回順位 {row['rank']}位\n" + "\n".join(scores) + note)
     return blocks
 
 
