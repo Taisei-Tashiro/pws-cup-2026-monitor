@@ -342,7 +342,7 @@ def messages(before, after, checked_at=None):
     if before["phase_id"] != after["phase_id"]:
         heading += f"フェーズ移行：{safe_text(before['phase_name'])} → {safe_text(after['phase_name'])}\n"
     heading += "\n"
-    footer = f"\n\n📎 全チームの順位・スコアは添付一覧へ（分割時は最後の通知に添付）。\nLeaderboard：{PAGE}\n更新ID: {event_id}"
+    footer = f"\n\nLeaderboard：{PAGE}\n更新ID: {event_id}"
     units = lambda text: len(text.encode("utf-16-le")) // 2
     budget = 1900 - units(heading + footer)
     if budget < 100:
