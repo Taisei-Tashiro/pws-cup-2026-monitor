@@ -1,10 +1,18 @@
 name: PWS Cup 2026 Monitor
+run-name: PWS Cup 2026 Monitor · ${{ inputs.trigger_source || github.event_name }}
 
 on:
   schedule:
     - cron: '1,6,11,16,21,26,31,36,41,46,51,56 * * * *'
   workflow_dispatch:
     inputs:
+      trigger_source:
+        description: '起動元（外部定期実行と手動実行を区別）'
+        type: choice
+        options:
+          - manual
+          - cron-job.org
+        default: manual
       dry_run:
         description: '取得・検証のみ（状態保存とDiscord通知を行わない）'
         type: boolean
