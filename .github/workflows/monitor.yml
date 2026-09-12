@@ -1,0 +1,75 @@
+name: PWS Cup 2026 Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '取得・検証のみ（状態保存とDiscord通知を行わない）'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pws-cup-2026-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Check configuration
+        id: config
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+          elif [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "mode=unconfigured" >> "$GITHUB_OUTPUT"
+            echo '::warning::DISCORD_WEBHOOK_URL is missing; monitoring is not active.'
+            echo '## 設定待ち：Discord Secret未登録。監視・通知は開始していません。' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "mode=monitor" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify public leaderboard access
+        if: steps.config.outputs.mode != 'monitor'
+        run: python main.py --dry-run
+      - name: Restore durable state
+        if: steps.config.outputs.mode == 'monitor'
+        run: |
+          if git ls-remote --exit-code --heads origin monitor-state; then
+            git fetch --no-tags --depth=1 origin monitor-state
+            git worktree add --detach .state-store FETCH_HEAD
+          else
+            code=$?
+            if [ "$code" -ne 2 ]; then exit "$code"; fi
+            git worktree add --detach .state-store HEAD
+          fi
+      - name: Monitor current leaderboard
+        id: check
+        if: steps.config.outputs.mode == 'monitor'
+        run: python main.py --state .state-store/.monitor/state.json
+      - name: Persist baseline and delivery progress
+        if: always() && steps.check.outcome != 'skipped' && steps.config.outputs.mode == 'monitor'
+        run: |
+          if [ ! -f .state-store/.monitor/state.json ]; then exit 0; fi
+          git -C .state-store config user.name 'github-actions[bot]'
+          git -C .state-store config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C .state-store add -f .monitor/state.json
+          if ! git -C .state-store diff --cached --quiet; then
+            git -C .state-store commit -m 'Save leaderboard state and notification progress'
+            git -C .state-store push origin HEAD:refs/heads/monitor-state
+          fi
