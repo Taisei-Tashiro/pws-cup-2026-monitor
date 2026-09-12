@@ -64,11 +64,60 @@ class MonitorTests(unittest.TestCase):
         self.assertEqual(self.sent, [])
         self.assertEqual(self.path.read_bytes(), original)
 
-    def test_submission_id_time_and_numeric_format_ignored(self):
+    def test_time_and_numeric_format_ignored(self):
         other = board()
-        other["submissions"][0].update(id=999, queue_name="999_Studio", created_when="new")
+        other["submissions"][0].update(created_when="new")
         other["submissions"][0]["scores"][0]["score"] = "0.9000"
-        self.assertEqual(self.initial, main.snapshot(phase(), other))
+        changed = main.snapshot(phase(), other)
+        self.assertEqual(main.changes(self.initial, changed), [])
+        self.assertEqual(changed['rows'][0]['submission_id'], 100)
+
+    def test_submission_id_change_alone_notifies_once(self):
+        self.run_monitor(self.initial)
+        other = board()
+        other['submissions'][0].update(id=999, queue_name='999_Studio')
+        changed = main.snapshot(phase(), other)
+        self.run_monitor(changed)
+        self.run_monitor(changed)
+        self.assertEqual(len(self.sent), 1)
+        self.assertIn('提出ID 100 → 999', self.sent[0])
+        self.assertNotIn('参加：', self.sent[0])
+
+    def test_cohort_team_and_current_submission_id_in_all_notices(self):
+        raw = board()
+        raw['submissions'][0].update(owner='zhiyan', slug_url='/profiles/user/zhiyan/')
+        old = main.snapshot(phase(), raw)
+        raw['submissions'][0].update(id=999, queue_name='999_Studio')
+        raw['submissions'][0]['scores'][0]['score'] = '0.95'
+        new = main.snapshot(phase(), raw)
+        empty = copy.deepcopy(new)
+        empty['rows'] = []
+        for before, after in [(old, new), (empty, new), (new, empty)]:
+            text = '\n'.join(main.changes(before, after))
+            self.assertIn('【コホート5】ステテコは恥だが役に立つ', text)
+            self.assertIn('CodaBench: zhiyan／提出ID: 999', text)
+
+    def test_display_names_and_verified_account_aliases(self):
+        for account, display, cohort in [('ryoga_sasaki','R',1), ('bank_san','harunaDan@GU',2),
+                                         ('tani_shumma','Shum',3), ('unfrozen','unfrozen',18)]:
+            raw = board()
+            raw['submissions'][0].update(owner=display, slug_url=f'/profiles/user/{account}/')
+            row = main.snapshot(phase(), raw)['rows'][0]
+            self.assertIn(f'【コホート{cohort}】', main.participant_label(row))
+
+    def test_old_saved_rows_upgrade_silently(self):
+        old = copy.deepcopy(self.initial)
+        for row in old['rows']:
+            row.pop('submission_id')
+        self.run_monitor(old)
+        self.run_monitor(self.initial)
+        self.assertEqual(self.sent, [])
+        self.assertEqual(main.load_state(self.path)['snapshot'], self.initial)
+
+    def test_unknown_participant_is_not_assigned_a_team(self):
+        label = main.participant_label(self.initial['rows'][0])
+        self.assertIn('コホート・チーム名未登録', label)
+        self.assertIn('提出ID: 100', label)
 
     def test_score_change_notifies_once(self):
         self.run_monitor(self.initial)

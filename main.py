@@ -12,7 +12,7 @@ import re
 import sys
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 from urllib.request import Request, urlopen
 
 COMPETITION_ID = 17698
@@ -126,7 +126,7 @@ def snapshot(phase, board):
             scores[key] = number(score["score"])
         normalized.append({
             "key": f"{base_key}:{occurrence}", "name": name,
-            "rank": rank, "scores": scores,
+            "rank": rank, "scores": scores, "submission_id": row["id"],
         })
     return {"phase_id": phase["id"], "phase_name": phase["name"],
             "columns": columns, "rows": normalized}
@@ -146,18 +146,40 @@ def safe_text(value):
     return re.sub(r"([\\`*_~>|])", r"\\\1", str(value)).replace("\n", " ")
 
 
+def participant_label(row):
+    """Enrich notification text without changing participant identity or diffing."""
+    teams = json.loads(Path(__file__).with_name("teams.json").read_text())
+    lookup = {}
+    for team in teams:
+        for account in [team.get("codabench"), *team.get("aliases", [])]:
+            if account:
+                lookup[account.casefold()] = team
+    # Also support snapshots saved before team metadata was introduced.
+    identity = json.loads(row["key"].rsplit(":", 1)[0])[0]
+    account = unquote(urlsplit(identity).path.rstrip("/").rsplit("/", 1)[-1])
+    team = lookup.get(account.casefold()) or lookup.get(row["name"].casefold())
+    sid = row.get("submission_id")
+    submission = str(sid) if sid is not None else "不明（旧保存データ）"
+    if team:
+        return (f"【コホート{team['cohort']}】{safe_text(team['team'])}"
+                f"（CodaBench: {safe_text(row['name'])}／提出ID: {submission}）")
+    return f"{safe_text(row['name'])}（コホート・チーム名未登録／提出ID: {submission}）"
+
+
 def changes(before, after):
     old = {r["key"]: r for r in before["rows"]}
     new = {r["key"]: r for r in after["rows"]}
     lines = []
     for key, row in new.items():
-        name = safe_text(row["name"])
+        name = participant_label(row)
         if key not in old:
             scores = ", ".join(f"{safe_text(after['columns'].get(k, k))}: {v}" for k, v in row["scores"].items())
             lines.append(f"参加：{name}（{row['rank']}位） {scores}")
             continue
         prev = old[key]
         details = []
+        if prev.get("submission_id") is not None and prev["submission_id"] != row.get("submission_id"):
+            details.append(f"提出ID {prev['submission_id']} → {row['submission_id']}")
         if prev["rank"] != row["rank"]:
             details.append(f"順位 {prev['rank']}位 → {row['rank']}位")
         for col in sorted(prev["scores"].keys() | row["scores"].keys()):
@@ -169,7 +191,7 @@ def changes(before, after):
             lines.append(f"更新：{name}／" + "、".join(details))
     for key, row in old.items():
         if key not in new:
-            lines.append(f"掲載終了：{safe_text(row['name'])}（前回 {row['rank']}位）")
+            lines.append(f"掲載終了：{participant_label(row)}（前回 {row['rank']}位）")
     return lines
 
 
@@ -260,7 +282,7 @@ def monitor(path, webhook, fetch=fetch_snapshot, send=send_discord):
         if state["snapshot"] != current:
             state["snapshot"] = current
             save_state(path, state)
-        print("No score, rank, or participant changes. No notification.")
+        print("No score, rank, participant, or submission ID changes. No notification.")
         return
     state["pending"] = {"snapshot": current, "messages": outgoing, "sent": 0}
     save_state(path, state)
