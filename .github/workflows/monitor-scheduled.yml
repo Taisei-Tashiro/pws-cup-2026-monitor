@@ -2,7 +2,7 @@ name: PWS Cup 2026 Monitor
 
 on:
   schedule:
-    - cron: '3-59/5 * * * *'
+    - cron: '1,6,11,16,21,26,31,36,41,46,51,56 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
