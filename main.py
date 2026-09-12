@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
@@ -146,7 +146,7 @@ def safe_text(value):
     return re.sub(r"([\\`*_~>|])", r"\\\1", str(value)).replace("\n", " ")
 
 
-def participant_label(row):
+def participant_label(row, previous=None):
     """Enrich notification text without changing participant identity or diffing."""
     teams = json.loads(Path(__file__).with_name("teams.json").read_text())
     lookup = {}
@@ -160,59 +160,100 @@ def participant_label(row):
     team = lookup.get(account.casefold()) or lookup.get(row["name"].casefold())
     sid = row.get("submission_id")
     submission = str(sid) if sid is not None else "不明（旧保存データ）"
-    if team:
-        return (f"【コホート{team['cohort']}】{safe_text(team['team'])}"
-                f"（CodaBench: {safe_text(row['name'])}／提出ID: {submission}）")
-    return f"{safe_text(row['name'])}（コホート・チーム名未登録／提出ID: {submission}）"
+    if previous and previous.get("submission_id") is not None and previous["submission_id"] != sid:
+        submission_line = f"提出ID {previous['submission_id']} → {submission}"
+    else:
+        submission_line = f"提出ID: {submission}"
+    title = (f"【コホート{team['cohort']}】{safe_text(team['team'])}" if team
+             else f"{safe_text(row['name'])}（コホート・チーム名未登録）")
+    return f"**{title}**\nCodaBench: {safe_text(row['name'])}\n{submission_line}"
+
+
+def metric_title(snapshot, key):
+    if "加工" in snapshot["phase_name"]:
+        short = {"score_1": "総合U", "score_2": "U_gen", "score_3": "U_spec",
+                 "score_4": "U_rare", "score_5": "U_valid", "score_6": "保護"}
+        if key.rsplit(":", 1)[-1] in short:
+            return safe_text(short[key.rsplit(":", 1)[-1]])
+    return safe_text(snapshot["columns"].get(key, key))
 
 
 def changes(before, after):
     old = {r["key"]: r for r in before["rows"]}
     new = {r["key"]: r for r in after["rows"]}
-    lines = []
+    blocks = []
     for key, row in new.items():
-        name = participant_label(row)
         if key not in old:
-            scores = ", ".join(f"{safe_text(after['columns'].get(k, k))}: {v}" for k, v in row["scores"].items())
-            lines.append(f"参加：{name}（{row['rank']}位） {scores}")
+            scores = [f"• {metric_title(after, k)}: {v if v is not None else '—'}"
+                      for k, v in row["scores"].items()]
+            blocks.append(f"🆕 参加：{participant_label(row)}\n• 順位 {row['rank']}位\n" + "\n".join(scores))
             continue
         prev = old[key]
+        id_changed = prev.get("submission_id") is not None and prev["submission_id"] != row.get("submission_id")
+        rank_changed = prev["rank"] != row["rank"]
         details = []
-        if prev.get("submission_id") is not None and prev["submission_id"] != row.get("submission_id"):
-            details.append(f"提出ID {prev['submission_id']} → {row['submission_id']}")
-        if prev["rank"] != row["rank"]:
-            details.append(f"順位 {prev['rank']}位 → {row['rank']}位")
         for col in sorted(prev["scores"].keys() | row["scores"].keys()):
             a, b = prev["scores"].get(col), row["scores"].get(col)
             if a != b:
-                title = after["columns"].get(col, before["columns"].get(col, col))
-                details.append(f"{safe_text(title)}: {a if a is not None else '—'} → {b if b is not None else '—'}")
-        if details:
-            lines.append(f"更新：{name}／" + "、".join(details))
+                source = after if col in after["columns"] else before
+                details.append(f"• {metric_title(source, col)}: {a if a is not None else '—'} → {b if b is not None else '—'}")
+        if id_changed or rank_changed or details:
+            rank = f"• 順位 {prev['rank']}位 → {row['rank']}位" if rank_changed else f"• 順位 {row['rank']}位（変更なし）"
+            if not details:
+                details.append("• スコア：変更なし")
+            blocks.append(f"🔄 更新：{participant_label(row, prev)}\n{rank}\n" + "\n".join(details))
     for key, row in old.items():
         if key not in new:
-            lines.append(f"掲載終了：{participant_label(row)}（前回 {row['rank']}位）")
-    return lines
+            blocks.append(f"📤 掲載終了：{participant_label(row)}\n• 前回順位 {row['rank']}位")
+    return blocks
 
 
-def messages(before, after):
-    lines = changes(before, after)
-    if not lines:
+def messages(before, after, checked_at=None):
+    blocks = changes(before, after)
+    if not blocks:
         return []
+    checked_at = checked_at or datetime.now(timezone.utc)
+    if checked_at.tzinfo is None:
+        raise MonitorError("Check timestamp must include a timezone")
+    checked_jst = checked_at.astimezone(timezone(timedelta(hours=9)))
     event_id = hashlib.sha256(json.dumps(after, sort_keys=True).encode()).hexdigest()[:10]
-    heading = f"PWS Cup 2026｜{safe_text(after['phase_name'])}\n"
+    heading = (f"**PWS Cup 2026｜Leaderboard更新**\n"
+               f"フェーズ：{safe_text(after['phase_name'])}\n"
+               f"確認時刻：{checked_jst:%Y/%m/%d %H:%M:%S} JST（日本時間）\n")
     if before["phase_id"] != after["phase_id"]:
         heading += f"フェーズ移行：{safe_text(before['phase_name'])} → {safe_text(after['phase_name'])}\n"
-    footer = f"\n{PAGE}\n更新ID: {event_id}"
+    heading += "\n"
+    footer = f"\n\nLeaderboard：{PAGE}\n更新ID: {event_id}"
+    units = lambda text: len(text.encode("utf-16-le")) // 2
+    budget = 1900 - units(heading + footer)
+    if budget < 100:
+        raise MonitorError("Notification header too long")
     chunks, current = [], ""
-    # Bound by UTF-16 units as well as Unicode characters for Discord's limit.
-    for line in lines:
-        for start in range(0, len(line), 550):
-            piece = line[start:start + 550]
-            candidate = current + ("\n" if current else "") + piece
-            if len((heading + candidate + footer).encode("utf-16-le")) // 2 > 1900:
-                if current:
-                    chunks.append(heading + current + footer)
+    for block in blocks:
+        # Keep each team together unless it alone exceeds Discord's limit.
+        pieces = []
+        if units(block) <= budget:
+            pieces = [block]
+        else:
+            piece = ""
+            for line in block.splitlines(keepends=True):
+                if units(piece + line) <= budget:
+                    piece += line
+                    continue
+                if piece:
+                    pieces.append(piece.rstrip("\n"))
+                    piece = ""
+                for char in line:
+                    if units(piece + char) > budget:
+                        pieces.append(piece.rstrip("\n"))
+                        piece = ""
+                    piece += char
+            if piece:
+                pieces.append(piece.rstrip("\n"))
+        for piece in pieces:
+            candidate = current + ("\n\n" if current else "") + piece
+            if units(candidate) > budget:
+                chunks.append(heading + current + footer)
                 current = piece
             else:
                 current = candidate
@@ -268,6 +309,7 @@ def monitor(path, webhook, fetch=fetch_snapshot, send=send_discord):
 
     flush()
     current = fetch()
+    checked_at = datetime.now(timezone.utc)
     if current is None:
         print("No active phase. Saved state preserved; no notification.")
         return
@@ -277,7 +319,7 @@ def monitor(path, webhook, fetch=fetch_snapshot, send=send_discord):
         save_state(path, state)
         print("Initial baseline saved. No Discord notification.")
         return
-    outgoing = messages(state["snapshot"], current)
+    outgoing = messages(state["snapshot"], current, checked_at=checked_at)
     if not outgoing:
         if state["snapshot"] != current:
             state["snapshot"] = current

@@ -55,7 +55,7 @@ class MonitorTests(unittest.TestCase):
         self.run_monitor(empty)
         self.assertEqual(self.sent, [])
         self.run_monitor(self.initial)
-        self.assertIn("参加：Alice", self.sent[0])
+        self.assertIn("参加：**Alice", self.sent[0])
 
     def test_initial_and_unchanged_are_silent(self):
         self.run_monitor(self.initial)
@@ -95,7 +95,8 @@ class MonitorTests(unittest.TestCase):
         for before, after in [(old, new), (empty, new), (new, empty)]:
             text = '\n'.join(main.changes(before, after))
             self.assertIn('【コホート5】ステテコは恥だが役に立つ', text)
-            self.assertIn('CodaBench: zhiyan／提出ID: 999', text)
+            self.assertIn('CodaBench: zhiyan\n提出ID', text)
+            self.assertIn('999', text)
 
     def test_display_names_and_verified_account_aliases(self):
         for account, display, cohort in [('ryoga_sasaki','R',1), ('bank_san','harunaDan@GU',2),
@@ -137,7 +138,7 @@ class MonitorTests(unittest.TestCase):
     def test_removed_team(self):
         changed = copy.deepcopy(self.initial)
         changed["rows"].pop()
-        self.assertIn("掲載終了：Bob", main.messages(self.initial, changed)[0])
+        self.assertIn("掲載終了：**Bob", main.messages(self.initial, changed)[0])
 
     def test_no_active_phase_preserves_state(self):
         self.run_monitor(self.initial)
@@ -212,6 +213,49 @@ class MonitorTests(unittest.TestCase):
             with self.assertRaises(main.MonitorError):
                 main.send_discord("https://example.org/webhooks/secret", "test")
         request.assert_not_called()
+
+    def test_readable_blocks_and_japan_check_time(self):
+        other = board()
+        other['submissions'][0].update(id=999, queue_name='999_Studio')
+        other['submissions'][0]['scores'][0]['score'] = '0.95'
+        checked = datetime(2026, 9, 12, 18, 4, 5, tzinfo=timezone.utc)
+        text = main.messages(self.initial, main.snapshot(phase(), other), checked_at=checked)[0]
+        self.assertIn('確認時刻：2026/09/13 03:04:05 JST（日本時間）', text)
+        self.assertIn('\nCodaBench: Alice\n提出ID 100 → 999\n', text)
+        self.assertIn('\n• 順位 1位（変更なし）\n• 総合U: 0.9 → 0.95', text)
+        self.assertEqual(main.messages(self.initial, self.initial, checked_at=checked), [])
+
+    def test_each_split_message_keeps_check_time_and_whole_team(self):
+        empty = copy.deepcopy(self.initial)
+        empty['rows'] = []
+        changed = copy.deepcopy(self.initial)
+        changed['rows'] = []
+        for i in range(40):
+            row = copy.deepcopy(self.initial['rows'][0])
+            row['key'] = row['key'].rsplit(':', 1)[0] + f':{i}'
+            row['name'] = f'Team{i:02}'
+            changed['rows'].append(row)
+        checked = datetime(2026, 9, 12, 12, tzinfo=timezone.utc)
+        chunks = main.messages(empty, changed, checked_at=checked)
+        self.assertGreater(len(chunks), 1)
+        for chunk in chunks:
+            self.assertIn('2026/09/12 21:00:00 JST', chunk)
+            self.assertLessEqual(len(chunk.encode('utf-16-le')) // 2, 2000)
+        for block in main.changes(empty, changed):
+            self.assertTrue(any(block in chunk for chunk in chunks))
+
+    def test_retry_keeps_original_check_timestamp(self):
+        self.run_monitor(self.initial)
+        changed = copy.deepcopy(self.initial)
+        changed['rows'][0]['submission_id'] = 999
+        def fail(*args):
+            raise main.MonitorError('simulated failure')
+        with self.assertRaises(main.MonitorError):
+            self.run_monitor(changed, fail)
+        pending = main.load_state(self.path)['pending']['messages'][:]
+        self.run_monitor(changed)
+        self.assertEqual(self.sent, pending)
+        self.assertIn('確認時刻：', self.sent[0])
 
     def test_fetch_uses_current_phase_endpoint_only(self):
         with patch("main.request_json", side_effect=[{"phases": [phase()]}, board()]) as request:
