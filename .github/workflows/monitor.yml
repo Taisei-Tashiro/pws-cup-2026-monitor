@@ -24,8 +24,8 @@ jobs:
     env:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Run regression tests
@@ -47,6 +47,21 @@ jobs:
       - name: Verify public leaderboard access
         if: steps.config.outputs.mode != 'monitor'
         run: python main.py --dry-run
+      - name: Verify Discord Webhook without sending a message
+        if: steps.config.outputs.mode == 'monitor'
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from main import request_json
+          url = os.environ['DISCORD_WEBHOOK_URL'].strip()
+          if not re.fullmatch(r'https://(?:discord\.com|discordapp\.com)/api(?:/v\d+)?/webhooks/\d+/[A-Za-z0-9._-]+', url):
+              raise SystemExit('Invalid Discord Webhook URL format')
+          metadata = request_json(url)
+          if metadata.get('channel_id') != '1548272951093235814':
+              raise SystemExit('Discord Webhook is not for the configured notification channel')
+          print('Discord Webhook verified for #codabench-update. No message sent.')
+          PY
       - name: Restore durable state
         if: steps.config.outputs.mode == 'monitor'
         run: |
