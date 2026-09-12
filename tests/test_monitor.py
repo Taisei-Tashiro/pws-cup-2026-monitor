@@ -35,7 +35,7 @@ class MonitorTests(unittest.TestCase):
 
     def run_monitor(self, current, sender=None):
         main.monitor(self.path, "not-a-real-secret", fetch=lambda: current,
-                     send=sender or (lambda hook, msg: self.sent.append(msg)))
+                     send=lambda hook, msg, **kwargs: (sender or (lambda h, m: self.sent.append(m)))(hook, msg))
 
     def test_current_phase_boundary_and_gap(self):
         comp = {"phases": [phase()]}
@@ -133,7 +133,8 @@ class MonitorTests(unittest.TestCase):
         raw = board()
         raw["submissions"].reverse()
         output = main.messages(self.initial, main.snapshot(phase(), raw))
-        self.assertIn("順位 2位 → 1位", output[0])
+        self.assertIn("順位のみの変更：2件", output[0])
+        self.assertNotIn("更新：", output[0])
 
     def test_removed_team(self):
         changed = copy.deepcopy(self.initial)
@@ -163,9 +164,8 @@ class MonitorTests(unittest.TestCase):
         self.assertIn('前回順位 1位', removed[0])
         self.assertIn('0.9', removed[0])
         updated = [b for b in blocks if '更新：' in b]
-        self.assertEqual(len(updated), 1)
-        self.assertIn('提出ID: 200', updated[0])
-        self.assertIn('順位 2位 → 1位', updated[0])
+        self.assertEqual(updated, [])
+        self.assertIn('順位のみの変更：1件', '\n'.join(blocks))
         self.assertNotIn('提出ID 100 → 200', '\n'.join(blocks))
 
     def test_all_removed_once_and_reappearance(self):
@@ -311,6 +311,76 @@ class MonitorTests(unittest.TestCase):
         self.run_monitor(changed)
         self.assertEqual(self.sent, pending)
         self.assertIn('確認時刻：', self.sent[0])
+
+    def test_new_submission_body_excludes_other_rank_changes(self):
+        raw = board()
+        raw['submissions'].insert(0, dict(raw['submissions'][0], id=300, owner='Carol', slug_url='/user/Carol', queue_name='300_Studio'))
+        raw['count'] = 3
+        after = main.snapshot(phase(), raw)
+        text = '\n'.join(main.messages(self.initial, after))
+        self.assertIn('参加：**Carol', text)
+        self.assertNotIn('CodaBench: Alice', text)
+        self.assertNotIn('CodaBench: Bob', text)
+        self.assertIn('順位のみの変更：2件', text)
+        doc = main.leaderboard_document(self.initial, after, datetime(2026, 9, 12, tzinfo=timezone.utc))
+        for name in ['Alice', 'Bob', 'Carol']:
+            self.assertIn(name, doc['text'])
+        self.assertIn('↓1', doc['text'])
+        self.assertIn('300', doc['text'])
+        self.assertIn('2026/09/12 09:00:00 JST', doc['text'])
+
+    def test_attachment_persisted_and_retried_without_rebuilding(self):
+        self.run_monitor(self.initial)
+        after = copy.deepcopy(self.initial)
+        after['rows'][0]['submission_id'] = 999
+        deliveries = []
+        def failed(hook, msg, attachment=None):
+            deliveries.append(attachment)
+            raise main.MonitorError('simulated attachment failure')
+        with self.assertRaises(main.MonitorError):
+            main.monitor(self.path, 'fake', fetch=lambda: after, send=failed)
+        pending = main.load_state(self.path)['pending']
+        self.assertEqual(pending['attachment'], deliveries[0])
+        def ok(hook, msg, attachment=None):
+            deliveries.append(attachment)
+        main.monitor(self.path, 'fake', fetch=lambda: after, send=ok)
+        self.assertEqual(deliveries[0], deliveries[1])
+        self.assertIsNone(main.load_state(self.path)['pending'])
+
+    def test_multipart_upload_preserves_japanese_and_mentions(self):
+        import json
+        from email.parser import BytesParser
+        from email.policy import default
+        from unittest.mock import MagicMock
+        attachment = {'filename': 'leaderboard-test.txt', 'text': '順位 ｜ チーム名\n1 ｜ ステテコ\n'}
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"id":"1"}'
+        with patch('main.urlopen', return_value=response) as opened:
+            main.send_discord('https://discord.com/api/webhooks/123/fake-token', '更新 @everyone', attachment=attachment)
+        req = opened.call_args.args[0]
+        mime = BytesParser(policy=default).parsebytes(('Content-Type: ' + req.get_header('Content-type') + '\r\nMIME-Version: 1.0\r\n\r\n').encode() + req.data)
+        parts = list(mime.iter_parts())
+        self.assertEqual(len(parts), 2)
+        payload = json.loads(parts[0].get_payload(decode=True))
+        self.assertEqual(payload['allowed_mentions'], {'parse': []})
+        self.assertEqual(payload['content'], '更新 @everyone')
+        self.assertEqual(parts[1].get_filename(), attachment['filename'])
+        self.assertEqual(parts[1].get_content(), attachment['text'])
+        self.assertEqual(parts[1].get_param('name', header='content-disposition'), 'files[0]')
+
+    def test_document_empty_and_long_names(self):
+        raw = board()
+        raw['submissions'][0].update(owner='kiku1924', slug_url='/user/kiku1924')
+        after = main.snapshot(phase(), raw)
+        checked = datetime(2026, 9, 12, tzinfo=timezone.utc)
+        doc = main.leaderboard_document(self.initial, after, checked)['text']
+        self.assertIn('省略した名称の全文', doc)
+        self.assertIn('JustGenerateIt', doc)
+        empty = copy.deepcopy(after)
+        empty['rows'] = []
+        doc = main.leaderboard_document(after, empty, checked)['text']
+        self.assertIn('現在掲載されている提出はありません', doc)
+        self.assertIn('提出ID 100', doc)
 
     def test_fetch_uses_current_phase_endpoint_only(self):
         with patch("main.request_json", side_effect=[{"phases": [phase()]}, board()]) as request:
