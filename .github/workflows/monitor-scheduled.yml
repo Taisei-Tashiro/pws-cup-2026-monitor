@@ -2,8 +2,6 @@ name: PWS Cup 2026 Monitor
 run-name: PWS Cup 2026 Monitor · ${{ inputs.trigger_source || github.event_name }}
 
 on:
-  schedule:
-    - cron: '1,6,11,16,21,26,31,36,41,46,51,56 * * * *'
   workflow_dispatch:
     inputs:
       trigger_source:
