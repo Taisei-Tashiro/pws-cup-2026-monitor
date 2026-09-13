@@ -45,6 +45,20 @@ cron-job.orgが5分ごと（Asia/Tokyo、毎時0・5・10…55分）にGitHub Ac
 - cron-job.orgのHTTP 200は起動要求の受付成功です。実際の監視はGitHub Actionsの `Monitor current leaderboard` と状態保存ステップの成功も確認します。起動要求の失敗時はcron-job.orgのメール通知が届く設定です。
 - 停止はcron-job.orgのジョブの `Enable job` をオフにします。GitHub標準の `schedule` は併用せず、手動実行用の `workflow_dispatch` は残します。
 
+## 未開始の監視を自動復旧
+
+同じ5分ごとの起動で、通常監視の `monitor`（ubuntu-latest）と復旧役の `watchdog`（ubuntu-24.04-arm）を並行実行します。排他制御はmonitorジョブだけに適用し、monitorが待機していても後続のwatchdogは動ける構成です。
+
+- このリポジトリ・main・monitor-scheduled.ymlの通常dispatchだけを対象にします。
+- monitorが10分以上未開始で、runner未割り当て・処理ステップ0件の場合だけ、状態を再確認して通常キャンセルを要求します。次の5分ごとの実行が引き継ぐため、通常は待機開始から10〜15分程度で解除を試みます。GitHubの遅延があればそれ以上かかります。
+- 実行中、runner割り当て済み、再実行attempt、別ジョブが実行中、API情報が不完全な場合は解除しません。強制キャンセルは使いません。1回に最大3件まで解除します。
+- 解除直前にmonitorが開始する競合に備え、開始済みmonitorジョブと後続の処理は通常キャンセルを受けても通知・状態保存を継続する条件にしています。実行時間上限は5分です。
+- watchdogにはこのリポジトリの一時的なGITHUB_TOKENでActions書き込み権限を付けます。Discord Secretはwatchdogに渡しません。追加のサービス登録や認証トークンは不要です。
+- GitHub全体の障害・全runner不足・cron-job.org停止では復旧役も動けない場合があります。独立した外部障害通知は未導入です。
+- Actionsログの `Release stale unassigned monitor jobs` と実行サマリーに解除要求を記録します。
+
+動作試験はRun workflowで `dry_run` と `recovery_probe` を両方ONにします。通常監視とは別の排他グループ・専用の未割り当てラベルで待機させ、次の通常実行のwatchdogが解除します。この隔離試験に限り待機判定は1分で、Discord通知・状態変更は行いません。通常利用では両方OFFです。
+
 ## 手元で確認
 
 ```sh

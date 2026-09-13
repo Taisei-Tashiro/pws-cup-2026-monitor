@@ -35,6 +35,12 @@ class WatchdogTests(unittest.TestCase):
                      [JOB, dict(name='watchdog', status='in_progress')]]:
             self.assertFalse(w.candidate(RUN, jobs, 99, NOW))
 
+    def test_isolated_probe_uses_one_minute_only_for_exact_label(self):
+        for seconds, expected in [(59, False), (60, True)]:
+            job = dict(JOB, labels=[w.PROBE_LABEL], created_at=(NOW-timedelta(seconds=seconds)).isoformat())
+            self.assertEqual(w.candidate(RUN, [job], 99, NOW), expected)
+        self.assertFalse(w.candidate(RUN, [dict(JOB, labels=["ubuntu-latest"], created_at=(NOW-timedelta(seconds=60)).isoformat())], 99, NOW))
+
     def test_invalid_date(self):
         self.assertFalse(w.candidate(RUN, [dict(JOB, created_at='bad')], 99, NOW))
 
