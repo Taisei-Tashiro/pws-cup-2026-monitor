@@ -43,9 +43,9 @@ jobs:
         run: python3 watchdog.py
 
   monitor:
-    # A normal cancellation must not interrupt delivery/state persistence if
-    # this job acquired its runner just after the watchdog's final check.
-    if: ${{ always() }}
+    # Allow cancellation while queued; step conditions protect delivery and
+    # state persistence if runner assignment races the final watchdog check.
+    if: ${{ !cancelled() }}
     permissions:
       contents: write
     concurrency:
