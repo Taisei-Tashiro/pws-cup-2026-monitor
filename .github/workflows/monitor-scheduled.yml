@@ -42,26 +42,6 @@ jobs:
           WATCHDOG_DRY_RUN: ${{ inputs.dry_run }}
         run: python3 watchdog.py
 
-      - name: Remove superseded isolated recovery probe
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 - <<'PY'
-          import os
-          from watchdog import GitHub, unassigned
-          api = GitHub(os.environ['GH_TOKEN'])
-          run = api.request('/actions/runs/34744806593')
-          jobs = api.collection('/actions/runs/34744806593/jobs?filter=latest', 'jobs')
-          monitors = [j for j in jobs if j['name'] == 'monitor']
-          if run['status'] != 'completed':
-              assert run['head_sha'] == '1adf1fd60811125d3a2cf88af69e167dce12ba3e'
-              assert len(monitors) == 1 and unassigned(monitors[0])
-              assert monitors[0]['labels'] == ['pws-cup-unassigned-recovery-probe']
-              assert all(j['status'] == 'completed' or unassigned(j) for j in jobs)
-              api.request('/actions/runs/34744806593/force-cancel', method='POST')
-              print('Removed obsolete isolated probe 34744806593; no production run targeted.')
-          PY
-
   monitor:
     # Allow cancellation while queued; step conditions protect delivery and
     # state persistence if runner assignment races the final watchdog check.
