@@ -15,28 +15,58 @@ on:
         description: '取得・検証のみ（状態保存とDiscord通知を行わない）'
         type: boolean
         default: false
+      recovery_probe:
+        description: '自動復旧の待機試験（dry_run=true時のみ。通常監視とは別枠）'
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
-
-concurrency:
-  group: pws-cup-2026-monitor
-  cancel-in-progress: false
+  contents: read
 
 jobs:
+  watchdog:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Test recovery safety rules
+        run: python3 -m unittest discover -s tests -p 'test_watchdog.py' -v
+      - name: Release stale unassigned monitor jobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WATCHDOG_DRY_RUN: ${{ inputs.dry_run }}
+        run: python3 watchdog.py
+
   monitor:
-    runs-on: ubuntu-latest
+    # A normal cancellation must not interrupt delivery/state persistence if
+    # this job acquired its runner just after the watchdog's final check.
+    if: ${{ always() }}
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ inputs.dry_run && inputs.recovery_probe && 'pws-cup-monitor-recovery-probe' || 'pws-cup-2026-monitor' }}
+      cancel-in-progress: false
+    runs-on: ${{ inputs.dry_run && inputs.recovery_probe && 'pws-cup-unassigned-recovery-probe' || 'ubuntu-latest' }}
     timeout-minutes: 5
     env:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v5
+        if: ${{ !failure() }}
       - uses: actions/setup-python@v6
+        if: ${{ !failure() }}
         with:
           python-version: '3.12'
       - name: Run regression tests
+        if: ${{ !failure() }}
         run: python -m unittest discover -s tests -v
       - name: Check configuration
+        if: ${{ !failure() }}
         id: config
         env:
           DRY_RUN: ${{ inputs.dry_run }}
@@ -51,10 +81,10 @@ jobs:
             echo "mode=monitor" >> "$GITHUB_OUTPUT"
           fi
       - name: Verify public leaderboard access
-        if: steps.config.outputs.mode != 'monitor'
+        if: ${{ !failure() && steps.config.outputs.mode != 'monitor' }}
         run: python main.py --dry-run
       - name: Verify Discord Webhook without sending a message
-        if: steps.config.outputs.mode == 'monitor'
+        if: ${{ !failure() && steps.config.outputs.mode == 'monitor' }}
         run: |
           python - <<'PY'
           import os
@@ -69,7 +99,7 @@ jobs:
           print('Discord Webhook verified for #codabench-update. No message sent.')
           PY
       - name: Restore durable state
-        if: steps.config.outputs.mode == 'monitor'
+        if: ${{ !failure() && steps.config.outputs.mode == 'monitor' }}
         run: |
           if git ls-remote --exit-code --heads origin monitor-state; then
             git fetch --no-tags --depth=1 origin monitor-state
@@ -81,7 +111,7 @@ jobs:
           fi
       - name: Monitor current leaderboard
         id: check
-        if: steps.config.outputs.mode == 'monitor'
+        if: ${{ !failure() && steps.config.outputs.mode == 'monitor' }}
         run: python main.py --state .state-store/.monitor/state.json
       - name: Persist baseline and delivery progress
         if: always() && steps.check.outcome != 'skipped' && steps.config.outputs.mode == 'monitor'
