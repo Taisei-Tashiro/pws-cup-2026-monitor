@@ -11,7 +11,22 @@
     },
     "phase_id": 29525,
     "phase_name": "本戦：加工フェーズ",
-    "rows": []
+    "rows": [
+      {
+        "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
+        "name": "zhiyan",
+        "rank": 1,
+        "scores": {
+          "35273:score_1": "1",
+          "35273:score_2": "1",
+          "35273:score_3": "1",
+          "35273:score_4": "1",
+          "35273:score_5": "1",
+          "35273:score_6": "0"
+        },
+        "submission_id": 923880
+      }
+    ]
   },
   "version": 1
 }
