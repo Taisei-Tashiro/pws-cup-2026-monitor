@@ -100,5 +100,32 @@ class WatchdogTests(unittest.TestCase):
         with self.assertRaises(w.WatchdogError):
             api.collection('/actions/runs/12/jobs', 'jobs')
 
+    def test_run_finishes_while_status_list_is_assembled(self):
+        api = w.GitHub('unused')
+        api.request = Mock(return_value=dict(total_count=1, workflow_runs=[]))
+        self.assertEqual(api.collection('/actions/runs?status=in_progress', 'workflow_runs'), [])
+        self.assertEqual(api.request.call_count, 1)
+
+    def test_changing_run_count_does_not_discard_discovered_runs(self):
+        api = w.GitHub('unused')
+        api.request = Mock(return_value=dict(total_count=2, workflow_runs=[RUN]))
+        self.assertEqual(api.collection('/actions/runs?status=queued', 'workflow_runs'), [RUN])
+        self.assertEqual(api.request.call_count, 1)
+
+    def test_full_run_page_does_not_trust_stale_count(self):
+        api = w.GitHub('unused')
+        page = [dict(RUN, id=i) for i in range(100)]
+        api.request = Mock(side_effect=[dict(total_count=1, workflow_runs=page),
+                                       dict(total_count=101, workflow_runs=[dict(RUN, id=100)])])
+        runs = api.collection('/actions/runs?status=queued', 'workflow_runs')
+        self.assertEqual(len(runs), 101)
+        self.assertIn('page=2', api.request.call_args.args[0])
+
+    def test_malformed_run_list_is_still_an_error(self):
+        api = w.GitHub('unused')
+        api.request = Mock(return_value=dict(total_count=1, workflow_runs=None))
+        with self.assertRaises(w.WatchdogError):
+            api.collection('/actions/runs?status=queued', 'workflow_runs')
+
 if __name__ == '__main__':
     unittest.main()

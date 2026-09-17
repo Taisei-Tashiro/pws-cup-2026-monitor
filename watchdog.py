@@ -59,6 +59,16 @@ class GitHub:
             if not isinstance(batch, list):
                 raise WatchdogError("Incomplete GitHub API response")
             result.extend(batch)
+            # Status-filtered run lists change while GitHub assembles a response.
+            # total_count can still include a run already absent from the page.
+            # Discovery may miss a moving run until the next five-minute check;
+            # cancellation still requires a complete job list and fresh recheck.
+            if key == "workflow_runs":
+                if len(batch) < 100:
+                    if payload.get("total_count", len(result)) > len(result):
+                        print(f"Active run list changed during discovery ({path}); using {len(result)} visible run(s).")
+                    return result
+                continue
             if len(result) >= payload.get("total_count", len(result)):
                 return result
             if not batch:

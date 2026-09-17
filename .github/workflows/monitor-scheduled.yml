@@ -42,6 +42,27 @@ jobs:
           WATCHDOG_DRY_RUN: ${{ inputs.dry_run }}
         run: python3 watchdog.py
 
+      - name: Read-only API consistency diagnostic
+        if: ${{ inputs.dry_run && !inputs.recovery_probe }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os, time
+          from watchdog import GitHub
+          api = GitHub(os.environ['GH_TOKEN'])
+          mismatches = 0
+          for sample in range(20):
+              for status in ('in_progress', 'pending', 'queued'):
+                  data = api.request('/actions/runs?branch=main&event=workflow_dispatch&status=' + status + '&per_page=100')
+                  count, rows = data['total_count'], len(data['workflow_runs'])
+                  if count != rows:
+                      mismatches += 1
+                      print(f'Sample {sample}, {status}: total_count={count}, returned={rows}', flush=True)
+              time.sleep(1)
+          print(f'Read-only diagnostic completed: {mismatches} inconsistent count(s).')
+          PY
+
   monitor:
     # Allow cancellation while queued; step conditions protect delivery and
     # state persistence if runner assignment races the final watchdog check.
