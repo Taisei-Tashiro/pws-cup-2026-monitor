@@ -13,9 +13,23 @@
     "phase_name": "本戦：加工フェーズ",
     "rows": [
       {
+        "key": "[\"/profiles/user/yokoyama/\", \"Studio\"]:1",
+        "name": "yokoyama",
+        "rank": 1,
+        "scores": {
+          "35273:score_1": "0.9889",
+          "35273:score_2": "0.991",
+          "35273:score_3": "0.9973",
+          "35273:score_4": "0.9889",
+          "35273:score_5": "0.9994",
+          "35273:score_6": "0.76"
+        },
+        "submission_id": 929697
+      },
+      {
         "key": "[\"/profiles/user/gghatano/\", \"Studio\"]:1",
         "name": "gghatano",
-        "rank": 1,
+        "rank": 2,
         "scores": {
           "35273:score_1": "0.968",
           "35273:score_2": "0.9689",
@@ -29,7 +43,7 @@
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 2,
+        "rank": 3,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
@@ -43,7 +57,7 @@
       {
         "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
         "name": "zhiyan",
-        "rank": 3,
+        "rank": 4,
         "scores": {
           "35273:score_1": "0.6188",
           "35273:score_2": "0.926",
