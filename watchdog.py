@@ -62,7 +62,7 @@ class GitHub:
             if len(result) >= payload.get("total_count", len(result)):
                 return result
             if not batch:
-                raise WatchdogError("Incomplete GitHub API pagination")
+                raise WatchdogError(f"Incomplete GitHub API pagination: {path}; total={payload.get('total_count')}; received={len(result)}; page={page}")
         raise WatchdogError("GitHub API pagination limit exceeded")
 
 
@@ -159,5 +159,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exc:
-        print(f"Watchdog failed: {type(exc).__name__}", file=sys.stderr)
+        reason = str(exc) if isinstance(exc, WatchdogError) else type(exc).__name__
+        print(f"Watchdog failed: {reason}", file=sys.stderr)
         sys.exit(1)
