@@ -3,8 +3,9 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
 REPOSITORY = "Taisei-Tashiro/pws-cup-2026-monitor"
@@ -40,15 +41,26 @@ class GitHub:
                      "Content-Type": "application/json",
                      "X-GitHub-Api-Version": "2026-03-10",
                      "User-Agent": "pws-cup-monitor-watchdog"})
-        try:
-            with self.opener.open(request, timeout=15) as response:
-                raw = response.read()
-                return json.loads(raw) if raw else None
-        except HTTPError as exc:
-            if method == "POST" and exc.code == 409:
-                return {"conflict": True}
-            # Do not include response bodies or credentials in logs.
-            raise WatchdogError(f"GitHub API {method} returned HTTP {exc.code}") from None
+        for attempt in range(3):
+            try:
+                with self.opener.open(request, timeout=15) as response:
+                    raw = response.read()
+                    return json.loads(raw) if raw else None
+            except HTTPError as exc:
+                exc.close()
+                if method == "POST" and exc.code == 409:
+                    return {"conflict": True}
+                transient = exc.code in {500, 502, 503, 504}
+                reason = f"HTTP {exc.code}"
+            except (URLError, TimeoutError, ConnectionError) as exc:
+                transient = True
+                reason = type(exc).__name__
+            # Retry reads only. Never repeat an ambiguous cancellation request,
+            # retry authentication/rate-limit failures, or expose response bodies.
+            if method != "GET" or not transient or attempt == 2:
+                raise WatchdogError(f"GitHub API {method} {path}: {reason}") from None
+            print(f"GitHub API read temporarily failed ({reason}); retry {attempt + 1}/2.")
+            time.sleep(2 ** attempt)
 
     def collection(self, path, key):
         result = []

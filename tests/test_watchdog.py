@@ -1,7 +1,8 @@
 import copy
 import unittest
 from datetime import datetime, timedelta, timezone
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock, patch
+from urllib.error import HTTPError, URLError
 import watchdog as w
 
 NOW = datetime(2026, 9, 13, 7, tzinfo=timezone.utc)
@@ -126,6 +127,35 @@ class WatchdogTests(unittest.TestCase):
         api.request = Mock(return_value=dict(total_count=1, workflow_runs=None))
         with self.assertRaises(w.WatchdogError):
             api.collection('/actions/runs?status=queued', 'workflow_runs')
+
+    @patch('watchdog.time.sleep')
+    def test_transient_reads_retry_then_succeed(self, sleep):
+        api = w.GitHub('private-test-token')
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"jobs": []}'
+        api.opener.open = Mock(side_effect=[HTTPError('https://api.github.com', 503, 'unavailable', {}, None),
+                                           URLError('temporary'), response])
+        self.assertEqual(api.request('/actions/runs/12/jobs'), {'jobs': []})
+        self.assertEqual([c.args[0] for c in sleep.call_args_list], [1, 2])
+
+    @patch('watchdog.time.sleep')
+    def test_persistent_failure_still_fails_without_leaking_details(self, sleep):
+        api = w.GitHub('private-test-token')
+        api.opener.open = Mock(side_effect=URLError('private-test-token'))
+        with self.assertRaises(w.WatchdogError) as error:
+            api.request('/actions/runs')
+        self.assertNotIn('private-test-token', str(error.exception))
+        self.assertEqual(api.opener.open.call_count, 3)
+
+    @patch('watchdog.time.sleep')
+    def test_no_retry_for_cancel_authentication_or_rate_limit(self, sleep):
+        for method, code in [('POST', 503), ('GET', 401), ('GET', 403), ('GET', 429)]:
+            api = w.GitHub('unused')
+            api.opener.open = Mock(side_effect=HTTPError('https://api.github.com', code, 'error', {}, None))
+            with self.subTest(method=method, code=code), self.assertRaises(w.WatchdogError):
+                api.request('/actions/runs/12/cancel' if method == 'POST' else '/actions/runs', method=method)
+            self.assertEqual(api.opener.open.call_count, 1)
+        sleep.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()
