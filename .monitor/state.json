@@ -17,14 +17,14 @@
         "name": "tsugiy",
         "rank": 1,
         "scores": {
-          "35273:score_1": "0.9951",
-          "35273:score_2": "0.997",
-          "35273:score_3": "0.9994",
-          "35273:score_4": "0.9951",
+          "35273:score_1": "0.9962",
+          "35273:score_2": "0.9973",
+          "35273:score_3": "0.9996",
+          "35273:score_4": "0.9962",
           "35273:score_5": "1",
           "35273:score_6": "1"
         },
-        "submission_id": 931309
+        "submission_id": 933359
       },
       {
         "key": "[\"/profiles/user/yokoyama/\", \"Studio\"]:1",
