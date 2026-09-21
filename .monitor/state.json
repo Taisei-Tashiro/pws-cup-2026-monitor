@@ -83,9 +83,23 @@
         "submission_id": 929723
       },
       {
+        "key": "[\"/profiles/user/bank_san/\", \"Studio\"]:1",
+        "name": "harunaDan@GU",
+        "rank": 6,
+        "scores": {
+          "35273:score_1": "0.8502",
+          "35273:score_2": "0.9743",
+          "35273:score_3": "0.8502",
+          "35273:score_4": "0.9758",
+          "35273:score_5": "1",
+          "35273:score_6": "0.92"
+        },
+        "submission_id": 936018
+      },
+      {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 6,
+        "rank": 7,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
@@ -99,7 +113,7 @@
       {
         "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
         "name": "zhiyan",
-        "rank": 7,
+        "rank": 8,
         "scores": {
           "35273:score_1": "0.6188",
           "35273:score_2": "0.926",
