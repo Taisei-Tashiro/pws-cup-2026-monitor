@@ -27,23 +27,9 @@
         "submission_id": 931500
       },
       {
-        "key": "[\"/profiles/user/4beshinji/\", \"Studio\"]:1",
-        "name": "4beshinji",
-        "rank": 2,
-        "scores": {
-          "35273:score_1": "0.9778",
-          "35273:score_2": "0.9929",
-          "35273:score_3": "0.9899",
-          "35273:score_4": "0.9778",
-          "35273:score_5": "1",
-          "35273:score_6": "0.9231"
-        },
-        "submission_id": 943415
-      },
-      {
         "key": "[\"/profiles/user/bank_san/\", \"Studio\"]:1",
         "name": "harunaDan@GU",
-        "rank": 3,
+        "rank": 2,
         "scores": {
           "35273:score_1": "0.9772",
           "35273:score_2": "0.9772",
@@ -57,7 +43,7 @@
       {
         "key": "[\"/profiles/user/nakajima/\", \"Studio\"]:1",
         "name": "nakajima",
-        "rank": 4,
+        "rank": 3,
         "scores": {
           "35273:score_1": "0.9765",
           "35273:score_2": "0.9765",
@@ -71,7 +57,7 @@
       {
         "key": "[\"/profiles/user/gghatano/\", \"Studio\"]:1",
         "name": "gghatano",
-        "rank": 5,
+        "rank": 4,
         "scores": {
           "35273:score_1": "0.968",
           "35273:score_2": "0.9689",
@@ -85,7 +71,7 @@
       {
         "key": "[\"/profiles/user/anonymada/\", \"Studio\"]:1",
         "name": "anonymada",
-        "rank": 6,
+        "rank": 5,
         "scores": {
           "35273:score_1": "0.9612",
           "35273:score_2": "0.9617",
@@ -99,7 +85,7 @@
       {
         "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
         "name": "Koroks in the forest",
-        "rank": 7,
+        "rank": 6,
         "scores": {
           "35273:score_1": "0.9564",
           "35273:score_2": "0.9564",
@@ -113,7 +99,7 @@
       {
         "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
         "name": "hidden",
-        "rank": 8,
+        "rank": 7,
         "scores": {
           "35273:score_1": "0.9528",
           "35273:score_2": "0.9759",
@@ -127,7 +113,7 @@
       {
         "key": "[\"/profiles/user/yokoyama/\", \"Studio\"]:1",
         "name": "yokoyama",
-        "rank": 9,
+        "rank": 8,
         "scores": {
           "35273:score_1": "0.948",
           "35273:score_2": "0.948",
@@ -141,7 +127,7 @@
       {
         "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
         "name": "kiku1924",
-        "rank": 10,
+        "rank": 9,
         "scores": {
           "35273:score_1": "0.9296",
           "35273:score_2": "0.9296",
@@ -155,7 +141,7 @@
       {
         "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
         "name": "zhiyan",
-        "rank": 11,
+        "rank": 10,
         "scores": {
           "35273:score_1": "0.922",
           "35273:score_2": "0.9365",
@@ -169,7 +155,7 @@
       {
         "key": "[\"/profiles/user/bot035/\", \"Studio\"]:1",
         "name": "bot035",
-        "rank": 12,
+        "rank": 11,
         "scores": {
           "35273:score_1": "0.9212",
           "35273:score_2": "0.9212",
@@ -183,7 +169,7 @@
       {
         "key": "[\"/profiles/user/yousay/\", \"Studio\"]:1",
         "name": "yousay",
-        "rank": 13,
+        "rank": 12,
         "scores": {
           "35273:score_1": "0.9181",
           "35273:score_2": "0.9181",
@@ -197,7 +183,7 @@
       {
         "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
         "name": "myjlabexe2026",
-        "rank": 14,
+        "rank": 13,
         "scores": {
           "35273:score_1": "0.9159",
           "35273:score_2": "0.9243",
@@ -211,7 +197,7 @@
       {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 15,
+        "rank": 14,
         "scores": {
           "35273:score_1": "0.9042",
           "35273:score_2": "0.9092",
@@ -225,7 +211,7 @@
       {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 16,
+        "rank": 15,
         "scores": {
           "35273:score_1": "0.9",
           "35273:score_2": "0.9011",
@@ -239,7 +225,7 @@
       {
         "key": "[\"/profiles/user/rq1543179/\", \"Studio\"]:1",
         "name": "rq1543179",
-        "rank": 17,
+        "rank": 16,
         "scores": {
           "35273:score_1": "0.8751",
           "35273:score_2": "0.9471",
@@ -253,7 +239,7 @@
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 18,
+        "rank": 17,
         "scores": {
           "35273:score_1": "0.8745",
           "35273:score_2": "0.92",
@@ -267,7 +253,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 19,
+        "rank": 18,
         "scores": {
           "35273:score_1": "0.8199",
           "35273:score_2": "0.8995",
@@ -277,6 +263,20 @@
           "35273:score_6": "1"
         },
         "submission_id": 943247
+      },
+      {
+        "key": "[\"/profiles/user/4beshinji/\", \"Studio\"]:1",
+        "name": "4beshinji",
+        "rank": 19,
+        "scores": {
+          "35273:score_1": "0.8079",
+          "35273:score_2": "0.9202",
+          "35273:score_3": "0.808",
+          "35273:score_4": "0.8401",
+          "35273:score_5": "0.8079",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943467
       },
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
