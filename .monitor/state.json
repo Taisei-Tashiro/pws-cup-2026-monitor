@@ -223,9 +223,23 @@
         "submission_id": 927017
       },
       {
+        "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
+        "name": "kiku1924",
+        "rank": 16,
+        "scores": {
+          "35273:score_1": "0.6763",
+          "35273:score_2": "0.9096",
+          "35273:score_3": "0.6763",
+          "35273:score_4": "0.8446",
+          "35273:score_5": "0.9969",
+          "35273:score_6": "1"
+        },
+        "submission_id": 942802
+      },
+      {
         "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
         "name": "zhiyan",
-        "rank": 16,
+        "rank": 17,
         "scores": {
           "35273:score_1": "0.5153",
           "35273:score_2": "0.9366",
