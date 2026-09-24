@@ -181,9 +181,23 @@
         "submission_id": 940811
       },
       {
+        "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
+        "name": "myjlabexe2026",
+        "rank": 13,
+        "scores": {
+          "35273:score_1": "0.9159",
+          "35273:score_2": "0.9243",
+          "35273:score_3": "0.9233",
+          "35273:score_4": "0.9159",
+          "35273:score_5": "0.9995",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943245
+      },
+      {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 13,
+        "rank": 14,
         "scores": {
           "35273:score_1": "0.9042",
           "35273:score_2": "0.9092",
@@ -197,7 +211,7 @@
       {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 14,
+        "rank": 15,
         "scores": {
           "35273:score_1": "0.9",
           "35273:score_2": "0.9011",
@@ -211,7 +225,7 @@
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 15,
+        "rank": 16,
         "scores": {
           "35273:score_1": "0.8426",
           "35273:score_2": "0.9195",
@@ -225,21 +239,21 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 16,
+        "rank": 17,
         "scores": {
-          "35273:score_1": "0.7081",
-          "35273:score_2": "0.9252",
-          "35273:score_3": "0.7081",
-          "35273:score_4": "0.9292",
-          "35273:score_5": "0.9905",
+          "35273:score_1": "0.8199",
+          "35273:score_2": "0.8995",
+          "35273:score_3": "0.8199",
+          "35273:score_4": "0.9378",
+          "35273:score_5": "0.9943",
           "35273:score_6": "1"
         },
-        "submission_id": 941496
+        "submission_id": 943247
       },
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 17,
+        "rank": 18,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
@@ -253,7 +267,7 @@
       {
         "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
         "name": "kiku1924",
-        "rank": 18,
+        "rank": 19,
         "scores": {
           "35273:score_1": "0.6763",
           "35273:score_2": "0.9096",
