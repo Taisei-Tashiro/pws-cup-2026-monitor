@@ -195,9 +195,23 @@
         "submission_id": 943245
       },
       {
+        "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
+        "name": "kiku1924",
+        "rank": 14,
+        "scores": {
+          "35273:score_1": "0.9135",
+          "35273:score_2": "0.9135",
+          "35273:score_3": "0.9483",
+          "35273:score_4": "0.917",
+          "35273:score_5": "0.9967",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943366
+      },
+      {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 14,
+        "rank": 15,
         "scores": {
           "35273:score_1": "0.9042",
           "35273:score_2": "0.9092",
@@ -211,7 +225,7 @@
       {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 15,
+        "rank": 16,
         "scores": {
           "35273:score_1": "0.9",
           "35273:score_2": "0.9011",
@@ -225,7 +239,7 @@
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 16,
+        "rank": 17,
         "scores": {
           "35273:score_1": "0.8745",
           "35273:score_2": "0.92",
@@ -239,7 +253,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 17,
+        "rank": 18,
         "scores": {
           "35273:score_1": "0.8199",
           "35273:score_2": "0.8995",
@@ -253,7 +267,7 @@
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 18,
+        "rank": 19,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
@@ -263,20 +277,6 @@
           "35273:score_6": "1"
         },
         "submission_id": 927017
-      },
-      {
-        "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
-        "name": "kiku1924",
-        "rank": 19,
-        "scores": {
-          "35273:score_1": "0.6763",
-          "35273:score_2": "0.9096",
-          "35273:score_3": "0.6763",
-          "35273:score_4": "0.8446",
-          "35273:score_5": "0.9969",
-          "35273:score_6": "1"
-        },
-        "submission_id": 942802
       }
     ]
   },
