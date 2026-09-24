@@ -13,23 +13,9 @@
     "phase_name": "本戦：加工フェーズ",
     "rows": [
       {
-        "key": "[\"/profiles/user/rq1543179/\", \"Studio\"]:1",
-        "name": "rq1543179",
-        "rank": 1,
-        "scores": {
-          "35273:score_1": "0.9977",
-          "35273:score_2": "0.9994",
-          "35273:score_3": "1",
-          "35273:score_4": "0.9977",
-          "35273:score_5": "1",
-          "35273:score_6": "0.8077"
-        },
-        "submission_id": 943006
-      },
-      {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
         "name": "shiroto",
-        "rank": 2,
+        "rank": 1,
         "scores": {
           "35273:score_1": "0.9965",
           "35273:score_2": "0.9965",
@@ -39,6 +25,20 @@
           "35273:score_6": "1"
         },
         "submission_id": 931500
+      },
+      {
+        "key": "[\"/profiles/user/4beshinji/\", \"Studio\"]:1",
+        "name": "4beshinji",
+        "rank": 2,
+        "scores": {
+          "35273:score_1": "0.9778",
+          "35273:score_2": "0.9929",
+          "35273:score_3": "0.9899",
+          "35273:score_4": "0.9778",
+          "35273:score_5": "1",
+          "35273:score_6": "0.9231"
+        },
+        "submission_id": 943415
       },
       {
         "key": "[\"/profiles/user/bank_san/\", \"Studio\"]:1",
@@ -237,9 +237,23 @@
         "submission_id": 942872
       },
       {
+        "key": "[\"/profiles/user/rq1543179/\", \"Studio\"]:1",
+        "name": "rq1543179",
+        "rank": 17,
+        "scores": {
+          "35273:score_1": "0.8751",
+          "35273:score_2": "0.9471",
+          "35273:score_3": "0.9824",
+          "35273:score_4": "0.8751",
+          "35273:score_5": "0.9936",
+          "35273:score_6": "0.9615"
+        },
+        "submission_id": 943414
+      },
+      {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 17,
+        "rank": 18,
         "scores": {
           "35273:score_1": "0.8745",
           "35273:score_2": "0.92",
@@ -253,7 +267,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 18,
+        "rank": 19,
         "scores": {
           "35273:score_1": "0.8199",
           "35273:score_2": "0.8995",
@@ -267,7 +281,7 @@
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 19,
+        "rank": 20,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
