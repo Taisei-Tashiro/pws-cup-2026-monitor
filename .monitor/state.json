@@ -251,9 +251,23 @@
         "submission_id": 943471
       },
       {
+        "key": "[\"/profiles/user/areare/\", \"Studio\"]:1",
+        "name": "areare",
+        "rank": 18,
+        "scores": {
+          "35273:score_1": "0.9021",
+          "35273:score_2": "0.9021",
+          "35273:score_3": "0.909",
+          "35273:score_4": "0.9109",
+          "35273:score_5": "1",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943750
+      },
+      {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 18,
+        "rank": 19,
         "scores": {
           "35273:score_1": "0.9",
           "35273:score_2": "0.9011",
@@ -267,7 +281,7 @@
       {
         "key": "[\"/profiles/user/rq1543179/\", \"Studio\"]:1",
         "name": "rq1543179",
-        "rank": 19,
+        "rank": 20,
         "scores": {
           "35273:score_1": "0.8792",
           "35273:score_2": "0.9471",
@@ -281,7 +295,7 @@
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 20,
+        "rank": 21,
         "scores": {
           "35273:score_1": "0.8745",
           "35273:score_2": "0.92",
@@ -295,7 +309,7 @@
       {
         "key": "[\"/profiles/user/4beshinji/\", \"Studio\"]:1",
         "name": "4beshinji",
-        "rank": 21,
+        "rank": 22,
         "scores": {
           "35273:score_1": "0.8219",
           "35273:score_2": "0.9119",
@@ -309,7 +323,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 22,
+        "rank": 23,
         "scores": {
           "35273:score_1": "0.8199",
           "35273:score_2": "0.899",
