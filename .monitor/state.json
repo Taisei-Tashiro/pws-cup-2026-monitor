@@ -111,9 +111,23 @@
         "submission_id": 940706
       },
       {
+        "key": "[\"/profiles/user/bot035/\", \"Studio\"]:1",
+        "name": "bot035",
+        "rank": 8,
+        "scores": {
+          "35273:score_1": "0.9212",
+          "35273:score_2": "0.9212",
+          "35273:score_3": "0.956",
+          "35273:score_4": "0.9598",
+          "35273:score_5": "0.9964",
+          "35273:score_6": "1"
+        },
+        "submission_id": 942664
+      },
+      {
         "key": "[\"/profiles/user/yousay/\", \"Studio\"]:1",
         "name": "yousay",
-        "rank": 8,
+        "rank": 9,
         "scores": {
           "35273:score_1": "0.9181",
           "35273:score_2": "0.9181",
@@ -127,7 +141,7 @@
       {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 9,
+        "rank": 10,
         "scores": {
           "35273:score_1": "0.9042",
           "35273:score_2": "0.9092",
@@ -141,7 +155,7 @@
       {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
         "name": "shiroto",
-        "rank": 10,
+        "rank": 11,
         "scores": {
           "35273:score_1": "0.8758",
           "35273:score_2": "0.9943",
@@ -155,7 +169,7 @@
       {
         "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
         "name": "hidden",
-        "rank": 11,
+        "rank": 12,
         "scores": {
           "35273:score_1": "0.8725",
           "35273:score_2": "0.8824",
@@ -169,7 +183,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 12,
+        "rank": 13,
         "scores": {
           "35273:score_1": "0.7081",
           "35273:score_2": "0.9252",
@@ -183,7 +197,7 @@
       {
         "key": "[\"/profiles/user/yanomichi/\", \"Studio\"]:1",
         "name": "yanomichi",
-        "rank": 13,
+        "rank": 14,
         "scores": {
           "35273:score_1": "0.7032",
           "35273:score_2": "0.7032",
@@ -197,7 +211,7 @@
       {
         "key": "[\"/profiles/user/zhiyan/\", \"Studio\"]:1",
         "name": "zhiyan",
-        "rank": 14,
+        "rank": 15,
         "scores": {
           "35273:score_1": "0.5153",
           "35273:score_2": "0.9366",
