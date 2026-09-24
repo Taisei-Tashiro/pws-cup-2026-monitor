@@ -181,9 +181,23 @@
         "submission_id": 940811
       },
       {
+        "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
+        "name": "kiku1924",
+        "rank": 13,
+        "scores": {
+          "35273:score_1": "0.917",
+          "35273:score_2": "0.9296",
+          "35273:score_3": "0.9591",
+          "35273:score_4": "0.917",
+          "35273:score_5": "0.9967",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943396
+      },
+      {
         "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
         "name": "myjlabexe2026",
-        "rank": 13,
+        "rank": 14,
         "scores": {
           "35273:score_1": "0.9159",
           "35273:score_2": "0.9243",
@@ -193,20 +207,6 @@
           "35273:score_6": "1"
         },
         "submission_id": 943245
-      },
-      {
-        "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
-        "name": "kiku1924",
-        "rank": 14,
-        "scores": {
-          "35273:score_1": "0.9135",
-          "35273:score_2": "0.9135",
-          "35273:score_3": "0.9483",
-          "35273:score_4": "0.917",
-          "35273:score_5": "0.9967",
-          "35273:score_6": "1"
-        },
-        "submission_id": 943366
       },
       {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
