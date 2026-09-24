@@ -111,9 +111,23 @@
         "submission_id": 942679
       },
       {
+        "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
+        "name": "hidden",
+        "rank": 8,
+        "scores": {
+          "35273:score_1": "0.9528",
+          "35273:score_2": "0.9759",
+          "35273:score_3": "0.9528",
+          "35273:score_4": "0.9583",
+          "35273:score_5": "1",
+          "35273:score_6": "1"
+        },
+        "submission_id": 943166
+      },
+      {
         "key": "[\"/profiles/user/yokoyama/\", \"Studio\"]:1",
         "name": "yokoyama",
-        "rank": 8,
+        "rank": 9,
         "scores": {
           "35273:score_1": "0.948",
           "35273:score_2": "0.948",
@@ -127,7 +141,7 @@
       {
         "key": "[\"/profiles/user/bot035/\", \"Studio\"]:1",
         "name": "bot035",
-        "rank": 9,
+        "rank": 10,
         "scores": {
           "35273:score_1": "0.9212",
           "35273:score_2": "0.9212",
@@ -141,7 +155,7 @@
       {
         "key": "[\"/profiles/user/yousay/\", \"Studio\"]:1",
         "name": "yousay",
-        "rank": 10,
+        "rank": 11,
         "scores": {
           "35273:score_1": "0.9181",
           "35273:score_2": "0.9181",
@@ -155,7 +169,7 @@
       {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 11,
+        "rank": 12,
         "scores": {
           "35273:score_1": "0.9042",
           "35273:score_2": "0.9092",
@@ -169,7 +183,7 @@
       {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 12,
+        "rank": 13,
         "scores": {
           "35273:score_1": "0.9",
           "35273:score_2": "0.9011",
@@ -179,20 +193,6 @@
           "35273:score_6": "1"
         },
         "submission_id": 942872
-      },
-      {
-        "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
-        "name": "hidden",
-        "rank": 13,
-        "scores": {
-          "35273:score_1": "0.8725",
-          "35273:score_2": "0.8824",
-          "35273:score_3": "0.8725",
-          "35273:score_4": "0.8942",
-          "35273:score_5": "0.9964",
-          "35273:score_6": "1"
-        },
-        "submission_id": 940479
       },
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
