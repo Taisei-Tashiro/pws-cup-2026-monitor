@@ -11,7 +11,21 @@
     },
     "phase_id": 29526,
     "phase_name": "本戦：攻撃フェーズ",
-    "rows": []
+    "rows": [
+      {
+        "key": "[\"/profiles/user/gghatano/\", \"Studio\"]:1",
+        "name": "gghatano",
+        "rank": 1,
+        "scores": {
+          "35274:score_1": "0.0986",
+          "35274:score_2": "0.0126",
+          "35274:score_3": "0.2",
+          "35274:score_4": "0.0721",
+          "35274:score_5": "0.0068"
+        },
+        "submission_id": 950932
+      }
+    ]
   },
   "version": 1
 }
