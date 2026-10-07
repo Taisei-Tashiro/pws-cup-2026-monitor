@@ -1,4 +1,22 @@
 {
+  "attack_history": {
+    "29526": {
+      "team:gghatano": [
+        950932,
+        961110,
+        965694
+      ],
+      "team:r": [
+        954803,
+        961281,
+        963654
+      ],
+      "team:tsugiy": [
+        954439,
+        966378
+      ]
+    }
+  },
   "pending": null,
   "snapshot": {
     "columns": {
