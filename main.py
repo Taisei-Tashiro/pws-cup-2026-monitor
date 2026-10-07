@@ -176,7 +176,70 @@ def team_metadata(row, phase_name=""):
     return team, team.get("cohorts", {}).get(stage) if team else None
 
 
-def participant_label(row, previous=None, phase_name=""):
+def attack_owner(row):
+    """Count a team across display names, queues and multiple leaderboard rows."""
+    team, _ = team_metadata(row)
+    if team and team.get("codabench"):
+        return "team:" + team["codabench"].casefold()
+    identity = json.loads(row["key"].rsplit(":", 1)[0])[0]
+    return "participant:" + identity
+
+
+def validate_attack_history(history):
+    if not isinstance(history, dict):
+        raise MonitorError("Invalid attack submission history")
+    for phase_id, owners in history.items():
+        if not isinstance(phase_id, str) or not phase_id.isdigit() or not isinstance(owners, dict):
+            raise MonitorError("Invalid attack submission history")
+        for owner, ids in owners.items():
+            if (not isinstance(owner, str) or not owner or not isinstance(ids, list)
+                    or any(type(sid) is not int or sid <= 0 for sid in ids)
+                    or len(set(ids)) != len(ids)):
+                raise MonitorError("Invalid attack submission history")
+    return history
+
+
+def load_attack_seed():
+    seed = json.loads(Path(__file__).with_name("attack_history_seed.json").read_text())
+    if seed.get("version") != 1:
+        raise MonitorError("Invalid attack history seed")
+    return validate_attack_history(seed["phases"])
+
+
+def merge_attack_history(state):
+    history = json.loads(json.dumps(load_attack_seed()))
+    for phase_id, owners in validate_attack_history(state.get("attack_history", {})).items():
+        for owner, ids in owners.items():
+            known = history.setdefault(phase_id, {}).setdefault(owner, [])
+            known.extend(sid for sid in ids if sid not in known)
+    state["attack_history"] = history
+    return history
+
+
+def record_attack_submissions(history, snap):
+    if not snap or "攻撃" not in snap["phase_name"]:
+        return
+    owners = history.setdefault(str(snap["phase_id"]), {})
+    # If several IDs first appear together, use ID order for stable numbering.
+    rows = sorted(snap["rows"], key=lambda row: row.get("submission_id") or 0)
+    for row in rows:
+        sid = row.get("submission_id")
+        if sid is None:
+            continue  # Old snapshots without an ID cannot contribute a count.
+        if type(sid) is not int or sid <= 0:
+            raise MonitorError("Invalid attack submission ID")
+        known = owners.setdefault(attack_owner(row), [])
+        if sid not in known:
+            known.append(sid)
+
+
+def attack_progress(row, phase_id, history):
+    ids = (history or {}).get(str(phase_id), {}).get(attack_owner(row), [])
+    sid = row.get("submission_id")
+    return (ids.index(sid) + 1, len(ids)) if sid in ids else None
+
+
+def participant_label(row, previous=None, phase_name="", phase_id=None, attack_history=None):
     team, cohort = team_metadata(row, phase_name)
     sid = row.get("submission_id")
     submission = str(sid) if sid is not None else "不明（旧保存データ）"
@@ -187,7 +250,14 @@ def participant_label(row, previous=None, phase_name=""):
     cohort_label = f"コホート{cohort}" if cohort is not None else "コホート未確認"
     title = (f"【{cohort_label}】{safe_text(team['team'])}" if team
              else f"{safe_text(row['name'])}（コホート・チーム名未登録）")
-    return f"**{title}**\nCodaBench: {safe_text(row['name'])}\n{submission_line}"
+    label = f"**{title}**\nCodaBench: {safe_text(row['name'])}\n{submission_line}"
+    if "攻撃" in phase_name and attack_history is not None:
+        progress = attack_progress(row, phase_id, attack_history)
+        if progress:
+            ordinal, total = progress
+            label += (f"\n攻撃提出：累計{total}件目（掲載確認ベース）" if ordinal == total else
+                      f"\n攻撃提出：{ordinal}件目の再掲載・継続／累計{total}件（掲載確認ベース）")
+    return label
 
 
 def metric_title(snapshot, key):
@@ -226,7 +296,7 @@ def align_rows(before, after):
     return old, new
 
 
-def changes(before, after):
+def changes(before, after, attack_history=None):
     old, new = align_rows(before, after)
     blocks = []
     rank_only = 0
@@ -234,7 +304,7 @@ def changes(before, after):
         if key not in old:
             scores = [f"• {metric_title(after, k)}: {v if v is not None else '—'}"
                       for k, v in row["scores"].items()]
-            blocks.append(f"🆕 参加：{participant_label(row, phase_name=after['phase_name'])}\n• 順位 {row['rank']}位\n" + "\n".join(scores))
+            blocks.append(f"🆕 参加：{participant_label(row, phase_name=after['phase_name'], phase_id=after['phase_id'], attack_history=attack_history)}\n• 順位 {row['rank']}位\n" + "\n".join(scores))
             continue
         prev = old[key]
         id_changed = prev.get("submission_id") is not None and prev["submission_id"] != row.get("submission_id")
@@ -251,7 +321,7 @@ def changes(before, after):
             rank = f"• 順位 {prev['rank']}位 → {row['rank']}位" if rank_changed else f"• 順位 {row['rank']}位（変更なし）"
             if not details:
                 details.append("• スコア：変更なし")
-            blocks.append(f"🔄 更新：{participant_label(row, prev, after['phase_name'])}\n{rank}\n" + "\n".join(details))
+            blocks.append(f"🔄 更新：{participant_label(row, prev, after['phase_name'], after['phase_id'], attack_history)}\n{rank}\n" + "\n".join(details))
     for key, row in old.items():
         if key not in new:
             same_phase = before["phase_id"] == after["phase_id"]
@@ -259,14 +329,14 @@ def changes(before, after):
             scores = [f"• 前回 {metric_title(before, k)}: {v if v is not None else '—'}"
                       for k, v in row["scores"].items()]
             note = "\nLeaderboardから掲載がなくなりました（理由はAPIでは判別できません）。" if same_phase else ""
-            blocks.append(f"📤 {reason}：{participant_label(row, phase_name=before['phase_name'])}"
+            blocks.append(f"📤 {reason}：{participant_label(row, phase_name=before['phase_name'], phase_id=before['phase_id'], attack_history=attack_history)}"
                           f"\n• 前回順位 {row['rank']}位\n" + "\n".join(scores) + note)
     if rank_only:
         blocks.append(f"📊 順位のみの変更：{rank_only}件（添付の全体一覧で確認できます）")
     return blocks
 
 
-def leaderboard_document(before, after, checked_at):
+def leaderboard_document(before, after, checked_at, attack_history=None):
     """Full current standings with display-width aligned Japanese pipe columns."""
     old, new = align_rows(before, after)
     columns = list(after["columns"])
@@ -289,7 +359,9 @@ def leaderboard_document(before, after, checked_at):
              f"確認時刻：{checked_at.astimezone(timezone(timedelta(hours=9))):%Y/%m/%d %H:%M:%S} JST（日本時間）",
              f"掲載件数：{len(after['rows'])}", "",
              "変動は前回確認時との比較。↑＝順位上昇、↓＝順位下降。新規＝新たに掲載された提出。", ""]
+    attack = "攻撃" in after["phase_name"] and attack_history is not None
     table = [["順位", "変動", "更新", "コホート", "チーム名", "CodaBench", "提出ID"] +
+             (["攻撃提出（件目/累計）"] if attack else []) +
              [metric_title(after, k).replace("\\", "") for k in columns]]
     legends = []
     for key, row in new.items():
@@ -301,8 +373,10 @@ def leaderboard_document(before, after, checked_at):
         updated = prior and (prior.get("submission_id") != row.get("submission_id") or prior["scores"] != row["scores"])
         status = "新規" if not prior else "提出/得点" if updated else "順位のみ" if delta else "—"
         short_name, short_account = clip(name, 28), clip(row['name'], 22)
+        progress = attack_progress(row, after['phase_id'], attack_history) if attack else None
         table.append([str(row['rank']), movement, status, str(cohort) if cohort is not None else "未確認",
                       short_name, short_account, str(row.get('submission_id', '不明'))] +
+                     ([f"{progress[0]}/{progress[1]}" if progress else "未確認"] if attack else []) +
                      [row['scores'].get(k) if row['scores'].get(k) is not None else "—" for k in columns])
         if short_name != plain(name) or short_account != plain(row['name']):
             legends.append(f"順位{row['rank']}：{plain(name)}（CodaBench: {plain(row['name'])}）")
@@ -313,6 +387,28 @@ def leaderboard_document(before, after, checked_at):
             lines.append("─┼─".join("─" * w for w in widths))
     if not after['rows']:
         lines.append("現在掲載されている提出はありません。")
+    if attack:
+        lines += ["", "攻撃提出は、このフェーズで掲載を確認した異なる提出IDの累計です。",
+                  "同じIDの再掲載は増やしません。同じ手法の再提出は別件となり、確認間隔の間に消えた提出は含められません。"]
+        totals = attack_history.get(str(after['phase_id']), {})
+        teams = json.loads(Path(__file__).with_name("teams.json").read_text())
+        stage = "final" if "本戦" in after['phase_name'] else "preliminary"
+        teams.sort(key=lambda team: (team.get("cohorts", {}).get(stage) is None,
+                                     team.get("cohorts", {}).get(stage) or 0))
+        lines += ["", "全チームの攻撃提出累計（取り下げ後も累計を保持）",
+                  "コホート ｜ チーム名 ｜ 掲載確認した提出数"]
+        represented = set()
+        for team in teams:
+            account = team.get("codabench")
+            owner = "team:" + account.casefold() if account else None
+            if owner:
+                represented.add(owner)
+            cohort = team.get("cohorts", {}).get(stage)
+            count = f"{len(totals.get(owner, []))}件" if owner else "アカウント未確認"
+            lines.append(f"{cohort if cohort is not None else '未確認'} ｜ {plain(team['team'])} ｜ {count}")
+        for owner in sorted(set(totals) - represented):
+            lines.append(f"未確認 ｜ {plain(owner)} ｜ {len(totals[owner])}件")
+        lines.append("0件は監視で掲載未確認を意味します。手法の種類数や非公開の提出数は分かりません。")
     removed = [row for key, row in old.items() if key not in new]
     if removed:
         lines += ["", "前回から掲載がなくなった提出（掲載終了理由は不明／フェーズ移行時は監視対象の変更）："]
@@ -327,8 +423,8 @@ def leaderboard_document(before, after, checked_at):
     return {"filename": f"leaderboard-{stamp}-JST.txt", "text": "\n".join(lines) + "\n"}
 
 
-def messages(before, after, checked_at=None):
-    blocks = changes(before, after)
+def messages(before, after, checked_at=None, attack_history=None):
+    blocks = changes(before, after, attack_history=attack_history)
     if not blocks:
         return []
     checked_at = checked_at or datetime.now(timezone.utc)
@@ -388,6 +484,7 @@ def load_state(path):
         state = json.loads(path.read_text())
         if state["version"] != 1 or not {"snapshot", "pending"} <= state.keys():
             raise ValueError()
+        validate_attack_history(state.get("attack_history", {}))
         return state
     except (ValueError, KeyError, TypeError):
         raise MonitorError("Invalid saved state; refusing to replace baseline") from None
@@ -413,6 +510,11 @@ def send_discord(webhook, content, attachment=None):
 
 def monitor(path, webhook, fetch=fetch_snapshot, send=send_discord):
     state = load_state(path)
+    original_history = json.dumps(state.get("attack_history"), sort_keys=True)
+    history = merge_attack_history(state)
+    record_attack_submissions(history, state["snapshot"])
+    if state["pending"]:
+        record_attack_submissions(history, state["pending"]["snapshot"])
 
     def flush():
         pending = state["pending"]
@@ -436,21 +538,22 @@ def monitor(path, webhook, fetch=fetch_snapshot, send=send_discord):
     if current is None:
         print("No active phase. Saved state preserved; no notification.")
         return
+    record_attack_submissions(history, current)
     print(f"Current phase: {current['phase_name']} ({current['phase_id']}); leaderboard rows: {len(current['rows'])}")
     if state["snapshot"] is None:
         state["snapshot"] = current
         save_state(path, state)
         print("Initial baseline saved. No Discord notification.")
         return
-    outgoing = messages(state["snapshot"], current, checked_at=checked_at)
+    outgoing = messages(state["snapshot"], current, checked_at=checked_at, attack_history=history)
     if not outgoing:
-        if state["snapshot"] != current:
+        if state["snapshot"] != current or original_history != json.dumps(history, sort_keys=True):
             state["snapshot"] = current
             save_state(path, state)
         print("No score, rank, participant, or submission ID changes. No notification.")
         return
     state["pending"] = {"snapshot": current, "messages": outgoing, "sent": 0,
-                        "attachment": leaderboard_document(state["snapshot"], current, checked_at)}
+                        "attachment": leaderboard_document(state["snapshot"], current, checked_at, attack_history=history)}
     save_state(path, state)
     flush()
     print(f"Discord confirmed {len(outgoing)} change notification(s). State saved.")

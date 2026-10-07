@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "definition": "Distinct submission IDs observed on the public attack-phase leaderboard; not unique algorithm contents.",
+  "coverage": {
+    "phase_id": 29526,
+    "phase_name": "本戦：攻撃フェーズ",
+    "observed_since": "2026-09-28T00:00:53Z",
+    "restored_through": "2026-10-07T07:45:34Z",
+    "poll_interval_minutes": 5,
+    "source_commits": [
+      "40e46d1e242b6cb50f3d808a66dec2bf7b7c7bbd",
+      "93a0477e7b279060beb25733b25e83d3fe263387",
+      "bcf2a9b89050c04df6b3e87d2c575b6e12d96dc8",
+      "3e2d424c210f487e5d71dd83ca0147ac7c566118",
+      "f17a6459e54a06b9decc62b0bb673ddd39723990",
+      "92ae24a492e65b1d7d65f47d20626a7af491c787",
+      "703e7e99b4810a59ccbf5cd1e7df3d9f10681bf1",
+      "61e1549537062d7487954975a3af1073cc3635b5",
+      "8b52c9154bfba7eb4ec60800862880119fa0fbf7"
+    ]
+  },
+  "phases": {
+    "29526": {
+      "team:gghatano": [
+        950932,
+        961110,
+        965694
+      ],
+      "team:tsugiy": [
+        954439,
+        966378
+      ],
+      "team:r": [
+        954803,
+        961281,
+        963654
+      ]
+    }
+  }
+}
