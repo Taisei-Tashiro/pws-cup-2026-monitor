@@ -20,7 +20,8 @@
       "team:koroks in the forest": [
         970310,
         972948,
-        972984
+        972984,
+        973011
       ],
       "team:r": [
         954803,
@@ -51,9 +52,22 @@
     "phase_name": "本戦：攻撃フェーズ",
     "rows": [
       {
+        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
+        "name": "Koroks in the forest",
+        "rank": 1,
+        "scores": {
+          "35274:score_1": "0.281",
+          "35274:score_2": "0.0577",
+          "35274:score_3": "0.4167",
+          "35274:score_4": "0.1569",
+          "35274:score_5": "0.0231"
+        },
+        "submission_id": 973011
+      },
+      {
         "key": "[\"/profiles/user/gghatano/\", \"Studio\"]:1",
         "name": "gghatano",
-        "rank": 1,
+        "rank": 2,
         "scores": {
           "35274:score_1": "0.2713",
           "35274:score_2": "0.0765",
@@ -66,7 +80,7 @@
       {
         "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
         "name": "kasuga",
-        "rank": 2,
+        "rank": 3,
         "scores": {
           "35274:score_1": "0.2571",
           "35274:score_2": "0.0451",
@@ -75,19 +89,6 @@
           "35274:score_5": "0.0095"
         },
         "submission_id": 971723
-      },
-      {
-        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
-        "name": "Koroks in the forest",
-        "rank": 3,
-        "scores": {
-          "35274:score_1": "0.2546",
-          "35274:score_2": "0.0577",
-          "35274:score_3": "0.3333",
-          "35274:score_4": "0.1517",
-          "35274:score_5": "0.0231"
-        },
-        "submission_id": 972984
       },
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
