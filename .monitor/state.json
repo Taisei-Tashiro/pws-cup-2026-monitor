@@ -19,7 +19,8 @@
       ],
       "team:koroks in the forest": [
         970310,
-        972948
+        972948,
+        972984
       ],
       "team:r": [
         954803,
@@ -76,9 +77,22 @@
         "submission_id": 971723
       },
       {
+        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
+        "name": "Koroks in the forest",
+        "rank": 3,
+        "scores": {
+          "35274:score_1": "0.2546",
+          "35274:score_2": "0.0577",
+          "35274:score_3": "0.3333",
+          "35274:score_4": "0.1517",
+          "35274:score_5": "0.0231"
+        },
+        "submission_id": 972984
+      },
+      {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 3,
+        "rank": 4,
         "scores": {
           "35274:score_1": "0.1967",
           "35274:score_2": "0.0745",
@@ -91,7 +105,7 @@
       {
         "key": "[\"/profiles/user/jinbocchi/\", \"Studio\"]:1",
         "name": "jinbocchi",
-        "rank": 4,
+        "rank": 5,
         "scores": {
           "35274:score_1": "0.1824",
           "35274:score_2": "0.0562",
@@ -100,19 +114,6 @@
           "35274:score_5": "0.0063"
         },
         "submission_id": 949270
-      },
-      {
-        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
-        "name": "Koroks in the forest",
-        "rank": 5,
-        "scores": {
-          "35274:score_1": "0.1717",
-          "35274:score_2": "0.0577",
-          "35274:score_3": "0.0231",
-          "35274:score_4": "0.1528",
-          "35274:score_5": "0.0231"
-        },
-        "submission_id": 972948
       },
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
