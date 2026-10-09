@@ -18,6 +18,9 @@
         961281,
         963654
       ],
+      "team:shiroto": [
+        971337
+      ],
       "team:tsugiy": [
         954439,
         966378
@@ -90,9 +93,22 @@
         "submission_id": 970310
       },
       {
+        "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
+        "name": "shiroto",
+        "rank": 5,
+        "scores": {
+          "35274:score_1": "0.1421",
+          "35274:score_2": "0.0562",
+          "35274:score_3": "0.0714",
+          "35274:score_4": "0.0951",
+          "35274:score_5": "0.0107"
+        },
+        "submission_id": 971337
+      },
+      {
         "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
         "name": "kiku1924",
-        "rank": 5,
+        "rank": 6,
         "scores": {
           "35274:score_1": "0.1139",
           "35274:score_2": "0.0475",
