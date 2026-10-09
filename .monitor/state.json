@@ -18,7 +18,8 @@
         971407
       ],
       "team:koroks in the forest": [
-        970310
+        970310,
+        972948
       ],
       "team:r": [
         954803,
@@ -101,9 +102,22 @@
         "submission_id": 949270
       },
       {
+        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
+        "name": "Koroks in the forest",
+        "rank": 5,
+        "scores": {
+          "35274:score_1": "0.1717",
+          "35274:score_2": "0.0577",
+          "35274:score_3": "0.0231",
+          "35274:score_4": "0.1528",
+          "35274:score_5": "0.0231"
+        },
+        "submission_id": 972948
+      },
+      {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 5,
+        "rank": 6,
         "scores": {
           "35274:score_1": "0.1694",
           "35274:score_2": "0.0598",
@@ -112,19 +126,6 @@
           "35274:score_5": "0"
         },
         "submission_id": 972342
-      },
-      {
-        "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
-        "name": "Koroks in the forest",
-        "rank": 6,
-        "scores": {
-          "35274:score_1": "0.1486",
-          "35274:score_2": "0.0175",
-          "35274:score_3": "0.25",
-          "35274:score_4": "0.1057",
-          "35274:score_5": "0"
-        },
-        "submission_id": 970310
       },
       {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
