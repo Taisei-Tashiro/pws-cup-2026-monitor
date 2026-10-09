@@ -7,6 +7,9 @@
         965694,
         967930
       ],
+      "team:kasuga": [
+        971723
+      ],
       "team:kiku1924": [
         965017,
         971407
@@ -55,9 +58,22 @@
         "submission_id": 967930
       },
       {
+        "key": "[\"/profiles/user/kasuga/\", \"Studio\"]:1",
+        "name": "kasuga",
+        "rank": 2,
+        "scores": {
+          "35274:score_1": "0.2571",
+          "35274:score_2": "0.0451",
+          "35274:score_3": "0.2857",
+          "35274:score_4": "0.1833",
+          "35274:score_5": "0.0095"
+        },
+        "submission_id": 971723
+      },
+      {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 2,
+        "rank": 3,
         "scores": {
           "35274:score_1": "0.1967",
           "35274:score_2": "0.0745",
@@ -70,7 +86,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 3,
+        "rank": 4,
         "scores": {
           "35274:score_1": "0.1664",
           "35274:score_2": "0.0636",
@@ -83,7 +99,7 @@
       {
         "key": "[\"/profiles/organization/4162/\", \"Studio\"]:1",
         "name": "Koroks in the forest",
-        "rank": 4,
+        "rank": 5,
         "scores": {
           "35274:score_1": "0.1486",
           "35274:score_2": "0.0175",
@@ -96,7 +112,7 @@
       {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
         "name": "shiroto",
-        "rank": 5,
+        "rank": 6,
         "scores": {
           "35274:score_1": "0.1421",
           "35274:score_2": "0.0562",
@@ -109,7 +125,7 @@
       {
         "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
         "name": "kiku1924",
-        "rank": 6,
+        "rank": 7,
         "scores": {
           "35274:score_1": "0.1406",
           "35274:score_2": "0.0437",
