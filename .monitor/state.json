@@ -49,6 +49,9 @@
       "team:shiroto": [
         971337
       ],
+      "team:shum": [
+        973576
+      ],
       "team:tsugiy": [
         954439,
         966378
@@ -189,9 +192,22 @@
         "submission_id": 974091
       },
       {
+        "key": "[\"/profiles/user/tani_shumma/\", \"Studio\"]:1",
+        "name": "Shum",
+        "rank": 10,
+        "scores": {
+          "35274:score_1": "0.1831",
+          "35274:score_2": "0.035",
+          "35274:score_3": "0.4",
+          "35274:score_4": "0.1233",
+          "35274:score_5": "0.0002"
+        },
+        "submission_id": 973576
+      },
+      {
         "key": "[\"/profiles/user/kiku1924/\", \"Studio\"]:1",
         "name": "kiku1924",
-        "rank": 10,
+        "rank": 11,
         "scores": {
           "35274:score_1": "0.1684",
           "35274:score_2": "0.0508",
@@ -204,7 +220,7 @@
       {
         "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
         "name": "myjlabexe2026",
-        "rank": 11,
+        "rank": 12,
         "scores": {
           "35274:score_1": "0.1464",
           "35274:score_2": "0.0342",
@@ -217,7 +233,7 @@
       {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
         "name": "shiroto",
-        "rank": 12,
+        "rank": 13,
         "scores": {
           "35274:score_1": "0.1421",
           "35274:score_2": "0.0562",
@@ -230,7 +246,7 @@
       {
         "key": "[\"/profiles/user/bank_san/\", \"Studio\"]:1",
         "name": "harunaDan@GU",
-        "rank": 13,
+        "rank": 14,
         "scores": {
           "35274:score_1": "0.1416",
           "35274:score_2": "0.0249",
