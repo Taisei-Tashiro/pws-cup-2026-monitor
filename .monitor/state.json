@@ -26,7 +26,8 @@
       "team:kiku1924": [
         965017,
         971407,
-        974967
+        974967,
+        975433
       ],
       "team:koroks in the forest": [
         970310,
@@ -178,13 +179,13 @@
         "name": "kiku1924",
         "rank": 9,
         "scores": {
-          "35274:score_1": "0.1616",
-          "35274:score_2": "0.0456",
+          "35274:score_1": "0.1684",
+          "35274:score_2": "0.0508",
           "35274:score_3": "0.0833",
           "35274:score_4": "0.1412",
           "35274:score_5": "0.0203"
         },
-        "submission_id": 974967
+        "submission_id": 975433
       },
       {
         "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
