@@ -7,6 +7,9 @@
       "participant:/profiles/user/hidden/": [
         974091
       ],
+      "team:4beshinji": [
+        975513
+      ],
       "team:gghatano": [
         950932,
         961110,
@@ -255,6 +258,19 @@
           "35274:score_5": "0"
         },
         "submission_id": 974409
+      },
+      {
+        "key": "[\"/profiles/user/4beshinji/\", \"Studio\"]:1",
+        "name": "4beshinji",
+        "rank": 15,
+        "scores": {
+          "35274:score_1": "0.1043",
+          "35274:score_2": "0.0578",
+          "35274:score_3": "0.1",
+          "35274:score_4": "0.0662",
+          "35274:score_5": "0.0054"
+        },
+        "submission_id": 975513
       }
     ]
   },
