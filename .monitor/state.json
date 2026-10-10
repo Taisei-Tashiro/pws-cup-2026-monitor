@@ -137,13 +137,13 @@
         "name": "R",
         "rank": 7,
         "scores": {
-          "35274:score_1": "0.1664",
-          "35274:score_2": "0.0636",
+          "35274:score_1": "0.1694",
+          "35274:score_2": "0.0598",
           "35274:score_3": "0",
-          "35274:score_4": "0.1273",
-          "35274:score_5": "0.0216"
+          "35274:score_4": "0.1423",
+          "35274:score_5": "0"
         },
-        "submission_id": 963654
+        "submission_id": 972342
       },
       {
         "key": "[\"/profiles/user/shiroto/\", \"Studio\"]:1",
