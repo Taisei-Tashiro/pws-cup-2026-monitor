@@ -8,7 +8,8 @@
       ],
       "participant:/profiles/user/hidden/": [
         974091,
-        976976
+        976976,
+        977246
       ],
       "team:4beshinji": [
         975513,
@@ -237,9 +238,22 @@
         "submission_id": 971742
       },
       {
+        "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
+        "name": "hidden",
+        "rank": 11,
+        "scores": {
+          "35274:score_1": "0.2416",
+          "35274:score_2": "0.0576",
+          "35274:score_3": "0.25",
+          "35274:score_4": "0.1441",
+          "35274:score_5": "0.0122"
+        },
+        "submission_id": 977246
+      },
+      {
         "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
         "name": "myjlabexe2026",
-        "rank": 11,
+        "rank": 12,
         "scores": {
           "35274:score_1": "0.2381",
           "35274:score_2": "0.0362",
@@ -252,7 +266,7 @@
       {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 12,
+        "rank": 13,
         "scores": {
           "35274:score_1": "0.2214",
           "35274:score_2": "0.0634",
@@ -261,19 +275,6 @@
           "35274:score_5": "0.0118"
         },
         "submission_id": 975191
-      },
-      {
-        "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
-        "name": "hidden",
-        "rank": 13,
-        "scores": {
-          "35274:score_1": "0.1979",
-          "35274:score_2": "0.0576",
-          "35274:score_3": "0.125",
-          "35274:score_4": "0.1415",
-          "35274:score_5": "0.0176"
-        },
-        "submission_id": 976976
       },
       {
         "key": "[\"/profiles/user/areare/\", \"Studio\"]:1",
