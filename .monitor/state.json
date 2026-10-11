@@ -3,7 +3,8 @@
     "29526": {
       "participant:/profiles/user/bot035/": [
         950037,
-        975209
+        975209,
+        977068
       ],
       "participant:/profiles/user/hidden/": [
         974091,
@@ -135,13 +136,13 @@
         "name": "bot035",
         "rank": 3,
         "scores": {
-          "35274:score_1": "0.4212",
+          "35274:score_1": "0.4218",
           "35274:score_2": "0.1741",
           "35274:score_3": "0.1429",
-          "35274:score_4": "0.2584",
+          "35274:score_4": "0.2531",
           "35274:score_5": "0.0226"
         },
-        "submission_id": 975209
+        "submission_id": 977068
       },
       {
         "key": "[\"/profiles/user/kinsuguru/\", \"Studio\"]:1",
