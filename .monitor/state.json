@@ -49,7 +49,8 @@
       ],
       "team:myjlabexe2026": [
         972756,
-        975812
+        975812,
+        977025
       ],
       "team:nakajima": [
         974063
@@ -233,9 +234,22 @@
         "submission_id": 971742
       },
       {
+        "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
+        "name": "myjlabexe2026",
+        "rank": 11,
+        "scores": {
+          "35274:score_1": "0.2381",
+          "35274:score_2": "0.0362",
+          "35274:score_3": "0.4312",
+          "35274:score_4": "0.1554",
+          "35274:score_5": "0.0018"
+        },
+        "submission_id": 977025
+      },
+      {
         "key": "[\"/profiles/user/ryoga_sasaki/\", \"Studio\"]:1",
         "name": "R",
-        "rank": 11,
+        "rank": 12,
         "scores": {
           "35274:score_1": "0.2214",
           "35274:score_2": "0.0634",
@@ -248,7 +262,7 @@
       {
         "key": "[\"/profiles/user/hidden/\", \"Studio\"]:1",
         "name": "hidden",
-        "rank": 12,
+        "rank": 13,
         "scores": {
           "35274:score_1": "0.1979",
           "35274:score_2": "0.0576",
@@ -261,7 +275,7 @@
       {
         "key": "[\"/profiles/user/areare/\", \"Studio\"]:1",
         "name": "areare",
-        "rank": 13,
+        "rank": 14,
         "scores": {
           "35274:score_1": "0.1968",
           "35274:score_2": "0.029",
@@ -274,7 +288,7 @@
       {
         "key": "[\"/profiles/user/tsugiy/\", \"Studio\"]:1",
         "name": "tsugiy",
-        "rank": 14,
+        "rank": 15,
         "scores": {
           "35274:score_1": "0.1967",
           "35274:score_2": "0.0745",
@@ -287,7 +301,7 @@
       {
         "key": "[\"/profiles/user/yokoyama/\", \"Studio\"]:1",
         "name": "yokoyama",
-        "rank": 15,
+        "rank": 16,
         "scores": {
           "35274:score_1": "0.1892",
           "35274:score_2": "0.0415",
@@ -296,19 +310,6 @@
           "35274:score_5": "0.0169"
         },
         "submission_id": 973028
-      },
-      {
-        "key": "[\"/profiles/user/myjlabexe2026/\", \"Studio\"]:1",
-        "name": "myjlabexe2026",
-        "rank": 16,
-        "scores": {
-          "35274:score_1": "0.1849",
-          "35274:score_2": "0.0361",
-          "35274:score_3": "0.4",
-          "35274:score_4": "0.0981",
-          "35274:score_5": "0.0002"
-        },
-        "submission_id": 975812
       },
       {
         "key": "[\"/profiles/user/tani_shumma/\", \"Studio\"]:1",
